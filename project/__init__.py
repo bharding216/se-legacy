@@ -89,10 +89,6 @@ def create_app():
                 user = None
             return user
 
-        @app.before_first_request
-        def set_user_type():
-            session['user_type'] = None
-
         @app.before_request
         def redirect_to_https():
             # Ensure that all requests are secure (HTTPS)
