@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Projects | STAR{% endblock %}
+
+{% block content %}
+
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+    <div class="container my-5">
+        {% for category, message in messages %}
+            {% if category == 'success' %}
+                <div class="alert alert-success mx-5" role="alert">
+                    {{ message }}
+                </div>
+            {% else %}
+                <div class="alert alert-danger mx-5" role="alert">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+
+<div class="pt-5">
+    <div class="container">
+        <h1 class="text-center">Manage Projects</h1>
+    </div>
+</div>
+
+
+<div class="py-5">
+    <div class="container">
+        <h3 class="mb-5">Create a New Project</h3>
+        <form action="{{ url_for('views.manage_project') }}" method="POST" enctype="multipart/form-data">
+
+            <div class="form-floating mb-4 col-md-8 col-lg-6">
+                <input type="text" class="form-control" id="project_title" name="project_title"
+                    placeholder="Project Title">
+                <label for="project_title">Project Title</label>
+            </div>
+
+            <div class="mb-4">
+                <select name="bid_type" class="form-select" 
+                    style="width:auto" id="bid_type">
+
+                    <option selected disabled="disabled">Choose a bid type</option>
+                    <option value="RFP">Request for Proposal (RFP)</option>
+                    <option value="RFQ">Request for Quote (RFQ)</option>
+                    <option value="RFI">Request for Information (RFI)</option>
+                </select>
+            </div>
+
+            <div class="form-floating mb-4 col-md-8 col-lg-6">
+                <input type="text" class="form-control" id="organization" name="organization"
+                    placeholder="Organization">
+                <label for="organization">Organization</label>
+            </div>
+
+            <div class="row">
+                <div class="col-6 col-md-3 mb-4">
+                    <label for="issue_date" class="form-label">Issue date:</label>
+                    <input type="date" id="issue_date" name="issue_date" class="form-control">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6 col-md-3 mb-4">
+                    <label for="close_date" class="form-label">Close date:</label>
+                    <input type="date" id="close_date" name="close_date" class="form-control">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6 col-md-3 mb-4">
+                    <label for="close_time" class="form-label">Close time:</label>
+                    <input type="time" id="close_time" name="close_time" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-floating mb-3 col-md-12 col-lg-8">
+                <textarea class="form-control" id="notes" name="notes"
+                    placeholder="Notes" style="height: 100px;"></textarea>
+                <label for="notes">Notes</label>
+            </div>    
+
+            <div class="mb-4 col-md-8 col-lg-6">
+                <input type="file" name="file[]" class="form-control" multiple>
+            </div>
+
+            <button type="submit" 
+                class="btn btn-primary"
+                style="width:auto">
+                Submit project
+            </button>
+
+        </form>
+    </div>
+</div>
+
+<div class="py-5">
+    <div class="container" style="overflow-x: auto;">
+        <h3 class="mb-5">View Projects</h3>
+
+        {% if bid_list|length == 0 %}
+
+            <p>There are no projects to view.</p>
+
+        {% else %}
+
+        <table style="margin: 0 auto">
+            <thead>
+                <tr>
+                    <th class="text-center align-middle" scope="col" style="width: 150px; padding-left: 10px;">Bid ID</th>
+                    <th class="text-center align-middle" scope="col" style="width: 300px; padding: 0px 20px;">Project Title</th>
+                    <th class="text-center align-middle" scope="col" style="width: 200px; padding: 0px 20px;">Type</th>
+                    <th class="text-center align-middle" scope="col" style="width: 200px; padding: 0px 20px;">Issue Date</th>
+                    <th class="text-center align-middle" scope="col" style="width: 200px; padding: 0px 20px;">Close Date/Time (Central)</th>
+                    <th class="text-center align-middle" scope="col" style="width: 200px; padding: 0px 20px;">View/Edit</th>
+
+                </tr>
+            </thead>
+    
+            <tbody>
+                {% for bid in bid_list %}
+                    <tr>
+                        <td class="text-center align-middle" style="padding-left: 10px;">{{ bid.id }}</td>
+                        <td class="text-center align-middle" style="width: 300px; padding: 0px 10px 0px 10px;">{{ bid.title }}</td>
+                        <td class="text-center align-middle" style="width: 300px; padding: 0px 10px 0px 10px;">{{ bid.type }}</td>
+                        <td class="text-center align-middle" style="width: 300px; padding: 0px 10px 0px 10px;">{{ bid.issue_date.strftime('%b-%d-%Y') }}</td>
+                        <td class="text-center align-middle" style="width: 300px; padding: 0px 10px 0px 10px;">{{ bid.close_date.strftime('%b-%d-%Y %I:%M %p') }}</td>
+
+                        <td class="text-center align-middle">
+                            <form action="{{ url_for('views.view_bid_details', bid_id=bid.id) }}" method="POST">
+                                <input type="hidden" name="project_title" value="{{ bid.title }}">
+                                <input type="hidden" name="bid_id" value="{{ bid.id }}">
+                                <button type="submit" 
+                                    class="btn btn-primary"
+                                    style="width:auto">
+                                    Select
+                                </button>
+                            </form>
+                        </td>
+
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% endif %}
+
+    </div>
+</div>
+
+
+
+
+{% endblock %}

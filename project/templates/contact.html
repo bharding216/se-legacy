@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}South Texas Agency for Resources | Contact{% endblock %}
+
+{% block head %}
+<script src="https://www.google.com/recaptcha/api.js"></script>
+
+<script>
+    function onSubmit(token) {
+      document.getElementById("contact-form").submit();
+    }
+  </script>
+{% endblock %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+    <div class="container my-5">
+        {% for category, message in messages %}
+            {% if category == 'success' %}
+                <div class="alert alert-success mx-5" role="alert">
+                    {{ message }}
+                </div>
+            {% else %}
+                <div class="alert alert-danger mx-5" role="alert">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+
+<div class="pt-5">
+    <div class="container">
+        <div class="row mb-3 text-center">   
+            <h1 class="mb-3" style="color: black;">Get In Touch</h1>
+            <p style="color: black;">We can answer any questions you might have about the bidding 
+                process and what to expect after you receive your 
+                bid has been accepted.</p>
+        </div>
+    </div>
+</div>
+
+
+<div class="container my-5">
+
+    <form action="{{ url_for('views.contact') }}" method="post" id="contact-form">
+
+        <div class="form-floating mb-3 col-md-8 col-lg-6">
+            <input type="text" class="form-control" id="first_name" name="first_name"
+                placeholder="First Name" value="{{ first_name }}" required>
+            <label for="first_name">First Name</label>
+        </div>
+
+        <div class="form-floating mb-3 col-md-8 col-lg-6">
+            <input type="text" class="form-control" id="last_name" name="last_name"
+                placeholder="Last Name" value="{{ last_name }}">
+            <label for="last_name">Last Name</label>
+        </div>
+
+        <div class="form-floating mb-3 col-md-8 col-lg-6">
+            <input type="email" class="form-control" id="email" name="email"
+                placeholder="Email" value="{{ email }}" required>
+            <label for="email">Email</label>
+        </div>
+
+        <div class="form-floating mb-3 col-md-8 col-lg-6">
+            <input type="tel" class="form-control" name="phone" id="phone" 
+                placeholder="Phone Number" value="{{ phone }}" maxlength="15"/> 
+            <label for="phone">Phone Number</label>
+        </div>
+
+        <div class="form-floating mb-3 col-md-12 col-lg-8">
+            <textarea class="form-control" id="message" name="message"
+                placeholder="Message" value="{{ message }}" style="height: 100px;" required></textarea>
+            <label for="message">Message</label>
+        </div>        
+
+        <button class="g-recaptcha btn btn-primary" 
+                data-sitekey="{{ recaptcha_site_key }}" 
+                data-callback='onSubmit' 
+                data-action='submit'
+                type="submit">Submit</button>
+
+    </form>
+
+</div>
+
+
+
+{% endblock %}

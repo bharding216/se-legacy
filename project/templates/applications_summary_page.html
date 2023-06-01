@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}My Applications | STAR{% endblock %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+    <div class="container my-5">
+        {% for category, message in messages %}
+            {% if category == 'success' %}
+                <div class="alert alert-success mx-5" role="alert">
+                    {{ message }}
+                </div>
+            {% else %}
+                <div class="alert alert-danger mx-5" role="alert">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+
+<div class="py-5">
+    <div class="container">
+        <div class="row mb-3">   
+            <div class="col-12 align-items-center justify-content-center d-flex">
+                <div class="text-center">
+                    <h1>My Applications</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="pb-5">
+    <div class="container" style="overflow-x: auto;">
+            {% if bid_list|length == 0 %}
+                <p>
+                    There are no applications associated with your vendor ID. To view open bids 
+                    <a class="hover-link-blue" href="{{ url_for('views.current_bids') }}">click here</a>.
+                </p>
+
+            {% else %}
+      
+                <table style="margin: 0 auto">
+                    <thead>
+                        <tr>
+                            <th class="text-center align-middle" scope="col" style="width: 150px; padding-left: 10px;">Bid ID</th>
+                            <th class="text-center align-middle" scope="col" style="width: 300px; padding: 0px 20px;">Bid Title</th>
+                            <th class="text-center align-middle" scope="col" style="width: 100px; padding: 0px 20px;">Bid Type</th>
+                            <th class="text-center align-middle" scope="col" style="width: 200px; padding: 0px 20px;">Close Date/Time (Central)</th>
+                            <th class="text-center align-middle" scope="col" style="width: 150px; padding: 0px 20px;">Status</th>
+                            <th class="text-center align-middle" scope="col" style="padding-right: 30px;">View Application</th>
+                        </tr>
+                    </thead>
+            
+                    <tbody>
+                        {% for bid in bid_list %}
+                            <tr>
+                                <td class="text-center align-middle" style="padding-left: 10px;">{{ bid.id }}</td>
+                                <td class="text-center align-middle" style="width: 300px; padding: 0px 10px 0px 10px;">{{ bid.title }}</td>
+                                <td class="text-center align-middle" style="width: 150px; padding: 0px 10px 0px 10px;">{{ bid.type }}</td>
+                                <td class="text-center align-middle" style="width: 300px; padding: 0px 10px 0px 10px;">{{ bid.close_date.strftime('%b-%d-%Y %I:%M %p') }}</td>
+                                <td class="text-center align-middle" style="width: 150; padding: 0px 10px 0px 10px;">{{ bid.status }}</td>
+                                <td class="text-center align-middle" style="padding-right: 40px;">
+                                    <form action="{{ url_for('views.view_bid_details', bid_id = bid.id) }}" method="POST">
+                                        <input type="hidden" name="project_title" value="{{ bid.title }}">
+                                        <input type="hidden" name="bid_id" value="{{ bid.id }}">
+                                        <button type="submit" 
+                                            class="btn btn-primary"
+                                            style="width:auto">
+                                            Select
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            {% endif %}
+
+    </div>
+</div>
+
+
+
+
+
+{% endblock %}

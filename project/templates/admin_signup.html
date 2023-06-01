@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}South Texas Agency for Resources | Signup{% endblock %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+    <div class="container my-5">
+        {% for category, message in messages %}
+            {% if category == 'success' %}
+                <div class="alert alert-success mx-5" role="alert">
+                    {{ message }}
+                </div>
+            {% else %}
+                <div class="alert alert-danger mx-5" role="alert">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+
+
+<div class="container my-5">
+
+    <form action="{{ url_for('views.admin_signup') }}" method="POST">
+
+        <h3 class="mb-3">Create Admin Account</h3>
+
+        <div class="form-floating mb-3 col-md-8 col-lg-6">
+            <input type="email" class="form-control" id="email" name="email"
+                placeholder="Email">
+            <label for="email">Email</label>
+        </div>
+
+        <div class="form-floating mb-3 col-md-8 col-lg-6">
+            <input type="password" class="form-control" name="password1"
+                placeholder="Password">
+            <label for="password1">Password</label>
+        </div>
+
+        <div class="form-floating mb-3 col-md-8 col-lg-6">
+            <input type="password" class="form-control" name="password2"
+                placeholder="Confirm Password">
+            <label for="password2">Confirm Password</label>
+        </div>
+
+        <div class="form-floating mb-3 col-md-8 col-lg-6">
+            <input type="password" class="form-control" name="secret_code"
+                placeholder="Secret Code">
+            <label for="secret_code">Secret Code</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Sign up</button>
+
+    </form>
+
+</div>
+
+
+
+{% endblock %}

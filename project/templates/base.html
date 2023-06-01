@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-F5MQ579MW2"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-F5MQ579MW2');
+    </script>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" 
+        rel="stylesheet" 
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" 
+        crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/d2d4a0cc10.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" />
+
+    <!-- Animate on Scroll -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Custom CSS + Fonts -->
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat|Nunito" rel="stylesheet">
+
+    <!-- Set Favicon -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- Cookie Consent Plugin -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css" />
+
+    <title>{% block title %}{% endblock %}</title>
+
+    {% block head %}
+    {% endblock %}
+</head>
+
+
+<body>
+    <div class="wrapper">
+
+        <!--Read the docs (https://getbootstrap.com/docs/4.0/components/navbar/)
+        for more details on these classes-->
+        <nav class="navbar sticky-top navbar-expand-lg navbar-custom static-top">
+            <div class="container">
+
+
+                <!--Logo to the left-->
+                <a class="navbar-brand" href="{{ url_for('views.index') }}">
+                    <img src="/static/logo.png" 
+                        width="240" height="120" class="d-inline-block align-top" alt="Unified Science Labs logo with an image of an Erlenmeyer flask made of bubbles">
+                </a>
+
+                <button class="navbar-toggler" 
+                    type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" 
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+
+                <!--Links to the right-->
+                <div class="navbar-collapse collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto me-5">
+
+                        {% if not user.is_authenticated %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" 
+                                href="#"
+                                id="navbarDropdownMenuLink"
+                                role="button"
+                                data-toggle="dropdown" 
+                                aria-haspopup="true" aria-expanded="false">
+                                Login
+                                </a>
+
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="dropdown-item" href="{{ url_for('views.login_vendor') }}">Vendor</a>
+                                    <a class="dropdown-item" href="{{ url_for('views.login_admin') }}">Admin</a>
+                                </div>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page" 
+                                    href="{{ url_for('views.registration_personal') }}">
+                                    Create an Account
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% if user.is_authenticated and session['user_type'] == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page" 
+                                    href="{{ url_for('views.manage_project') }}">
+                                    Manage Projects
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% if user.is_authenticated and session['user_type'] == 'supplier' %}
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page" 
+                                    href="{{ url_for('views.applications_summary_page') }}">
+                                    My Applications
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page" 
+                                    href="{{ url_for('views.supplier_settings') }}">
+                                    Edit Profile
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" 
+                                href="{{ url_for('views.contact') }}">
+                                Contact
+                            </a>
+                        </li>
+
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page" 
+                                    href="{{ url_for('views.logout') }}">
+                                    Logout
+                                </a>
+                            </li>
+                        {% endif %}
+
+                    </ul>
+
+                </div>
+
+            <!--close container div-->
+            </div>
+        </nav>
+
+        <div class="main-content">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+
+
+
+
+        <!--FOOTER-->
+        <!--Great example for the footer: (https://mdbootstrap.com/docs/standard/navigation/footer/)-->
+
+        <div class="text-center p-5 footer">
+            {% block footer %}
+
+            <div class="row pb-5 pt-3 footer-row">
+                <div class="col-6">
+                    <a href="{{ url_for('views.index') }}"><img src="/static/logo.png" width="240" height="120" class="img-fluid rounded"></a>
+                    <p class="mt-3" style="color: black; font-size: small;">
+                        The Premier Resource for Government Contractors
+                        - The Ultimate Platform for Collaborative Innovation.
+                    </p>
+                </div>
+
+                <div class="col-6">
+                    <h5 class="pb-2" style="color: black;">Quick Links</h5>
+
+                    <p class="footer-links">                            
+                        <a href="{{ url_for('views.login_vendor') }}" class="nav-link">Vendor Login</a>
+                    </p>
+
+                    <p class="footer-links">
+                        <a class="nav-link" href="{{ url_for('views.registration_personal') }}">Create an Account</a>
+                    </p>
+
+                    <p class="footer-links">
+                        <a class="nav-link" href="{{ url_for('views.contact') }}">Contact</a>
+                    </p>
+
+                    <!--
+                    <p class="footer-links">                            
+                        <a href="{{ url_for('views.terms') }}" class="nav-link">Terms & Conditions</a>
+                    </p>
+
+                    <p class="footer-links">                            
+                        <a href="{{ url_for('views.privacy') }}" class="nav-link">Privacy Policy</a>
+                    </p>-->
+                </div>
+            </div>
+
+
+            <div class="row">
+                <p style="color: black;">
+                    &copy; 2023 South Texas Agency for Resources
+                </p>
+
+                <p style="color: black;">
+                    Powered by Caffeine and <a class="hover-link" href="https://www.getsurmount.com/"
+                    target="_blank"
+                    rel="noopener noreferrer">Surmount Web Design & Development</a>
+                </p>
+            </div>
+
+
+            {% endblock %}
+        </div>
+
+
+
+
+    <!--close wrapper div-->
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Bootstrap Javascript -->  
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    
+
+
+
+    <!-- NavBar Dropdown Menu Javascript -->
+    <script>
+        $('.dropdown-toggle').click(function(e) {
+            e.preventDefault();
+    
+            var menu = $(this).next('.dropdown-menu');
+    
+            // Check if other menu is already open
+            var otherMenu = $('.dropdown-menu').not(menu);
+            if (otherMenu.is(':visible')) {
+                otherMenu.hide();
+            }
+    
+            menu.toggle();
+        });
+    
+        $(document).click(function(e) {
+            var target = e.target;
+            if (!$(target).is('.dropdown-toggle') && !$(target).parents().is('.dropdown-toggle')) {
+                $('.dropdown-menu').hide();
+            }
+        });
+    
+        // Hide dropdown menus when the user clicks outside of them
+        $(document).on('click', function(e) {
+            if (!$('.dropdown-toggle').is(e.target) && $('.dropdown-toggle').has(e.target).length === 0) {
+                $('.dropdown-menu').hide();
+            }
+        });
+    </script>
+    
+
+
+    <!-- Animate on Scroll Javascript -->  
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        AOS.init();
+    </script>
+
+
+</body>
+</html>

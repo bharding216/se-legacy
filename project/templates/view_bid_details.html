@@ -1,0 +1,533 @@
+{% extends "base.html" %}
+
+{% block title %}View Bid Details | STAR{% endblock %}
+
+{% block head %}
+<style>
+#create_acct_link {
+  color: blue;
+  text-decoration: underline;
+}
+
+#create_acct_link:hover {
+  color: black;
+  text-decoration: underline;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+
+<div class="container my-5">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'success' %}
+                    <div class="alert alert-success mx-5" role="alert">
+                        {{ message }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger mx-5" role="alert">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <h3>Current Project: <u>{{ bid_object.title }}</u></h3>
+        </div>
+    </div>
+</div>
+
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12 col-lg-6 mb-5 mb-lg-0">
+            <div class="card">
+                <div class="card-header d-flex align-items-center table-header-primary">
+                    <h4 class="m-0">Bid Details</h4>
+                </div>
+
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Project ID: {{ bid_object.id }}</li>
+                    <li class="list-group-item">Bid Type: {{bid_object.type}}</li>
+                    <li class="list-group-item">Status: {{ bid_object.status }}</li>
+                    <li class="list-group-item">Issue Date: {{ bid_object.issue_date.strftime('%b-%d-%Y') }}</li>
+                    <li class="list-group-item">Close Date/Time (CST): {{ bid_object.close_date.strftime('%b-%d-%Y %I:%M %p') }}</li>
+                    <li class="list-group-item">Notes: {{ bid_object.notes }}</li>
+                </ul>
+            </div>
+        </div>
+
+
+        {% if project_meta_records|length != 0 %}
+        <div class="col-12 col-lg-6">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card" style="overflow-x: auto;">
+                        <div class="card-header d-flex align-items-center table-header-primary">
+                            <h4 class="m-0">Bid Attachments</h4>
+                        </div>
+
+                        <div class="card-body d-flex justify-content-center">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="text-center align-middle" scope="col" 
+                                            style="width: 300px; padding: 0px 20px;">
+                                            Document Title
+                                        </th>
+                    
+                                        {% if user.is_authenticated and session['user_type'] == 'admin' %}
+                    
+                                        <th class="text-center align-middle" scope="col" 
+                                            style="width: 200px; padding: 0px 20px;" colspan="2">
+                                            Manage Docs
+                                        </th>
+                    
+                                        {% else %}
+                    
+                                        <th class="text-center align-middle" scope="col" 
+                                            style="width: 200px; padding: 0px 20px;">
+                                            Download
+                                        </th>
+                    
+                                        {% endif %}
+                                    </tr>
+                                </thead>
+                        
+                                <tbody>
+                                    {% for record in project_meta_records %}
+                                        <tr>
+                                            <td class="text-center align-middle" style="padding-left: 10px;">{{ record.title }}</td>
+                    
+                                            <td class="text-center align-middle" style="padding: 0px 20px;">
+                                                <form action="{{ url_for('views.download_project') }}" method="POST">
+                                                    <input type="hidden" name="filename" value="{{ record.title }}">
+                                                    <input type="hidden" name="date_time_stamp" value="{{ record.date_time_stamp }}">
+                                                    <button type="submit" 
+                                                        class="btn btn-primary"
+                                                        style="width:auto">
+                                                        Download
+                                                    </button>
+                                                </form>
+                                            </td>
+                    
+                                            {% if user.is_authenticated and session['user_type'] == 'admin' %}
+                                            <td class="text-center align-middle" style="padding: 0px 20px;">
+                                                <form action="{{ url_for('views.delete_doc') }}" method="POST" onsubmit="return confirmDeleteDoc()">
+                                                    <input type="hidden" name="filename" value="{{ record.title }}">
+                                                    <input type="hidden" name="doc_id" value="{{ record.id }}">
+                                                    <input type="hidden" name="bid_id" value="{{ record.bid_id }}">
+                                                    <input type="hidden" name="date_time_stamp" value="{{ record.date_time_stamp }}">
+                                                    <button type="submit" 
+                                                        class="btn btn-primary"
+                                                        style="width:auto">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </td>
+                                            {% endif %}
+                    
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if user.is_authenticated and session['user_type'] == 'admin' %}
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header d-flex align-items-center table-header-primary">
+                            <h4 class="m-0">Attach additional docs</h4>
+                        </div>
+
+                        <div class="card-body">
+                            <form action="{{ url_for('views.upload_doc') }}" method="POST" enctype="multipart/form-data">
+                
+                                <input type="file" name="file[]" class="form-control" multiple>
+                                <input type="hidden" name="bid_id" value="{{ bid_object.id }}">
+                
+                                <br>
+                
+                                <button type="submit" 
+                                    class="btn btn-primary"
+                                    style="width:auto">
+                                    Attach files
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+
+
+        </div>
+        {% endif %}
+
+
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% if user.is_authenticated and session['user_type'] == 'supplier' and bid_object.status == 'open' %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex align-items-center table-header-primary">
+                    <h4 class="m-0">Chat History</h4>
+                </div>
+
+                <div class="card-body">
+                    {% if chat_history_records|length == 0 %}
+
+                        <p>Use our chat tool to directly message the bid manager.</p>
+
+                    {% else %}
+
+                        <button type="button" 
+                                class="btn btn-primary"
+                                style="width:auto"
+                                onclick="toggleChatHistory()"
+                                id="chat_button">
+                                Hide
+                        </button>
+
+                        <div id="chat_history">
+                            <div style="width: 800px; overflow-x: auto;" class="mx-auto">
+                                <table style="width: 100%">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center align-middle" scope="col" style="width: 100px;">Author</th>
+                                            <th class="text-center align-middle" scope="col" style="width: 300px; padding: 0px 20px;">Comment</th>
+                                            <th class="text-center align-middle" scope="col" style="width: 250px; padding: 0px 0px;">Date/Time (CST)</th>
+                                        </tr>
+                                    </thead>
+                        
+                                    <tbody>
+                                        {% for record in chat_history_records %}
+                                            <tr>
+                                                <td class="text-center align-middle" style="width: 100px; padding-left: 10px;">{{ record.author_type }}</td>
+                                                <td class="text-center align-middle" style="width: 200px; padding: 0px 20px;">{{ record.comment }}</td>
+                                                <td class="text-center align-middle" style="width: 200px; padding: 0px 20px;">{{ record.datetime_stamp.strftime('%b-%d-%Y %I:%M %p') }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                    {% endif %}
+
+
+                            <div>
+                                <form action="{{ url_for('views.post_chat_message') }}" method="POST">
+                                    <div class="row justify-content-center">
+                                        <div class="col-12 col-sm-6 mb-3 mb-sm-0">
+                                            <textarea class="form-control" placeholder="Message" aria-label="Message" aria-describedby="basic-addon2" name="message" required></textarea>
+                                        </div>       
+
+                                        <input type="hidden" name="bid_id" value="{{ bid_object.id }}">
+
+                                        <div class="col-6 col-sm-4 d-flex justify-content-center align-items-center">
+                                            <button class="btn btn-primary" 
+                                                    type="submit" style="height: auto;">Add message</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+
+
+
+
+
+
+
+
+
+{% if user.is_authenticated and session['user_type'] == 'admin' %}
+    {% if applications_for_bid|length != 0 %}
+        <div class="pb-5">
+            <div class="container" style="overflow-x: auto;">
+                <h4 class="mb-3">Applications Received</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="text-center align-middle" scope="col" style="width: 150px; padding-left: 10px;">Supplier ID</th>
+                            <th class="text-center align-middle" scope="col" style="width: 200px; padding: 0px 20px;">Company Name</th>
+                            <th class="text-center align-middle" scope="col" style="width: 250px; padding: 0px 20px;">Date/Time Submitted (Central)</th>
+                            <th class="text-center align-middle" scope="col" style="width: 150px; padding: 0px 20px;">View</th>
+                        </tr>
+                    </thead>
+            
+                    <tbody>
+                        {% for application in applications_for_bid %}
+                            <tr>
+                                <td class="text-center align-middle" style="padding-left: 10px;">{{ application.supplier_id }}</td>
+                                <td class="text-center align-middle" style="width: 300px; padding: 0px 10px 0px 10px;">{{ application.supplier.company_name }}</td>
+                                <td class="text-center align-middle" style="width: 300px; padding: 0px 10px 0px 10px;">{{ application.date_time_stamp.strftime('%b-%d-%Y %I:%M %p') }}</td>
+                                <td class="text-center align-middle">
+                                    <form action="{{ url_for('views.view_application', bid_id=bid_object.id, supplier_id=application.supplier_id) }}" method="POST">
+                                        <button type="submit" 
+                                            class="btn btn-primary"
+                                            style="width:auto">
+                                            Select
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+
+
+    <div class="container my-5 py-5">
+        <div class="row">
+            <div class="col-12 d-flex justify-content-center">
+                <h4 class="mb-3">Delete Project and Attached Documents</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 d-flex justify-content-center">
+                <form action="{{ url_for('views.delete_project') }}" method="POST" onsubmit="return confirmDeleteProject()">
+                    <input type="hidden" name="bid_id" value="{{ bid_object.id }}">
+                    <button type="submit" 
+                        class="btn btn-danger"
+                        style="width:auto">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+
+
+
+
+{% if not user.is_authenticated and bid_object.status == 'open' %}
+<div class="container my-5">
+    <h4 class="mb-3">To apply for this bid, please 
+        <a class="hover-link" href="{{ url_for('views.registration_personal') }}"
+            target="_blank" rel="noopener noreferrer" id="create_acct_link">create an account</a> or
+        <a class="hover-link" 
+            href="{{ url_for('views.login_vendor') }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            id="create_acct_link">
+            log in</a>.</h4>
+</div>
+{% endif %}
+
+{% if applied_status == 'applied' %}
+<div class="container my-5">
+    <div style="overflow-x: auto;">
+        <h4>Your Application Files</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th class="text-center align-middle" scope="col" 
+                        style="width: 300px; padding: 0px 20px;">
+                        Document Title
+                    </th>
+
+                    <th class="text-center align-middle" scope="col" 
+                        style="width: 200px; padding: 0px 20px;" colspan="2">
+                        Manage Docs
+                    </th>
+                </tr>
+            </thead>
+    
+            <tbody>
+                {% for document in applications_for_bid_and_supplier %}
+                    <tr>
+                        <td class="text-center align-middle" style="padding-left: 10px;">{{ document.filename }}</td>
+
+                        <td class="text-center align-middle" style="padding: 0px 20px;">
+                            <form action="{{ url_for('views.download_application_doc') }}" method="POST">
+                                <input type="hidden" name="filename" value="{{ document.filename }}">
+                                <input type="hidden" name="date_time_stamp" value="{{ document.date_time_stamp }}">
+                                <button type="submit" 
+                                    class="btn btn-primary"
+                                    style="width:auto">
+                                    Download
+                                </button>
+                            </form>
+                        </td>
+
+                        <td class="text-center align-middle" style="padding: 0px 20px;">
+                            <form action="{{ url_for('views.delete_application_doc') }}" method="POST" onsubmit="return confirmDeleteDoc()">
+                                <input type="hidden" name="filename" value="{{ document.filename }}">
+                                <input type="hidden" name="doc_id" value="{{ document.id }}">
+                                <input type="hidden" name="bid_id" value="{{ document.bid_id }}">
+                                <input type="hidden" name="date_time_stamp" value="{{ document.date_time_stamp }}">
+                                <button type="submit" 
+                                    class="btn btn-primary"
+                                    style="width:auto">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+
+
+{% if user.is_authenticated and session['user_type'] == 'supplier' and bid_object.status == 'open' %}
+<div class="container mb-5">
+    
+    {% if applications_for_bid_and_supplier|length == 0 %}
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex align-items-center table-header-primary">
+                    <h4 class="m-0">Submit an application for this project</h4>
+                </div>
+
+                <div class="card-body">
+                    <form action="{{ url_for('views.apply_for_bid') }}" method="POST" enctype="multipart/form-data" onsubmit="return confirmApply()">
+                        <input type="hidden" name="bid_id" value="{{ bid_object.id }}">
+
+                        <div class="mb-4 col-md-8 col-lg-6">
+                            <input type="file" name="file[]" class="form-control" multiple>
+                            <br>
+                            <p>To submit multiple files, hold down the control key (Ctrl) on Windows or command (Cmd) on Mac.</p>
+                        </div>
+
+                        <button type="submit" 
+                            class="btn btn-primary"
+                            style="width:auto">
+                            Apply
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+
+    <h4 class="mb-3">Attach more files to your application</h4>
+    <form action="{{ url_for('views.apply_for_bid') }}" method="POST" enctype="multipart/form-data" onsubmit="return confirmApply()">
+        <input type="hidden" name="bid_id" value="{{ bid_object.id }}">
+
+        <div class="mb-4 col-md-8 col-lg-6">
+            <input type="file" name="file[]" class="form-control" multiple>
+            <br>
+            <p>To submit multiple files, hold down the control key (Ctrl) on Windows or command (Cmd) on Mac.</p>
+        </div>
+
+        <button type="submit" 
+            class="btn btn-primary"
+            style="width:auto">
+            Attach
+        </button>
+
+    </form>
+
+    {% endif %}
+
+
+
+</div>
+{% endif %}
+
+
+
+
+
+
+<script>
+
+    function toggleChatHistory() {
+        var div = document.getElementById("chat_history");
+        var button = document.getElementById("chat_button")
+        if (div.style.display === "none") {
+            div.style.display = "block";
+            button.innerHTML = "Hide";
+        } else {
+            div.style.display = "none";
+            button.innerHTML = "Show";
+        }
+    }
+
+
+    function confirmDeleteDoc() {
+        if (confirm("Are you sure you want to delete this file? You cannot undo this action.")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function confirmDeleteProject() {
+        if (confirm("Are you sure you want to delete this project? You cannot undo this action.")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    function confirmApply() {
+        const confirmation = window.confirm("Are you sure you've attached all your files?");
+        if (confirmation) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+</script>
+
+{% endblock %}

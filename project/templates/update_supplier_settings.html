@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Update Vendor Settings | STAR{% endblock %}
+
+{% block head %}
+<style>
+    .password-toggle-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    padding-right: 5px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    }
+
+
+    #password {
+    padding-right: 40px; /* Ensure enough space for the icon */
+    }
+
+    #togglePassword1 {
+    font-size: 1.25rem;
+    color: gray;
+    }
+    #togglePassword2 {
+    font-size: 1.25rem;
+    color: gray;
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'success' %}
+                    <div class="alert alert-success mx-5" role="alert">
+                        {{ message }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger mx-5" role="alert">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col">
+            <h2>Update your profile</h2>
+        </div>
+    </div>
+</div>
+
+
+<div class="container my-5">
+
+    <!-- 'lab_object' and 'field_name' are received from 'provider_settings' view function by 
+        the template. Then, the form action passes the parameters to the 'update_lab' view function
+        through the URL. -->
+    <form action="{{ url_for('views.update_supplier_settings', field_name=field_name) }}" method="POST">
+            
+            {% if field_name == 'password' %}
+
+            <div class="form-floating mb-3 col-md-8 col-lg-6">
+                <input type="password" 
+                        name="password1" 
+                        class="form-control"
+                        placeholder="Enter Password">
+                <span class="password-toggle-icon toggle-password">
+                    <i class="fa-solid fa-eye" id="togglePassword1"></i>
+                </span>
+                <label for="password1">Enter New Password</label>
+            </div>
+
+            <div class="form-floating mb-3 col-md-8 col-lg-6">
+                <input type="password" 
+                        name="password2" 
+                        class="form-control"
+                        placeholder="Confirm Password">
+                <span class="password-toggle-icon toggle-password">
+                    <i class="fa-solid fa-eye" id="togglePassword2"></i>
+                </span>
+                <label for="password2">Confirm New Password</label>
+            </div>
+
+            {% else %}
+
+            <div class="form-floating mb-4 col-md-8 col-lg-6">
+                <input type="text" 
+                        class="form-control"
+                        name="{{ field_name }}" 
+                        value="{{ user[field_name] }}"
+                        placeholder="{{ field_name|replace('_',' ')|title }}">
+
+                <!--returns a title-cased string-->
+                <label for="{{ field_name }}">{{ field_name|replace('_',' ')|title }}</label>
+            </div>
+
+            {% endif %}
+        
+            <input type="submit" class="btn btn-primary" value="Save Changes">
+
+        </form>
+
+</div>
+            
+
+
+
+<script>
+    const togglePassword1 = document.querySelector('#togglePassword1');
+    const password1 = document.querySelector('[name="password1"]');
+
+    togglePassword1.addEventListener('click', function (e) {
+        // toggle the type attribute
+        const type = password1.getAttribute('type') === 'password' ? 'text' : 'password';
+        password1.setAttribute('type', type);
+        // toggle the eye icon
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    const togglePassword2 = document.querySelector('#togglePassword2');
+    const password2 = document.querySelector('[name="password2"]');
+
+    togglePassword2.addEventListener('click', function (e) {
+        // toggle the type attribute
+        const type = password2.getAttribute('type') === 'password' ? 'text' : 'password';
+        password2.setAttribute('type', type);
+        // toggle the eye icon
+        this.classList.toggle('fa-eye-slash');
+    });
+
+</script>
+
+
+
+{% endblock %}

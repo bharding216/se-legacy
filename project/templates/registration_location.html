@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Vendor Registration | South Texas Agency for Resources{% endblock %}
+
+
+
+{% block content %}
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        <div class="container my-5">
+            {% for category, message in messages %}
+                {% if category == 'success' %}
+                    <div class="alert alert-success mx-5" role="alert">
+                        {{ message }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger mx-5" role="alert">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1>Vendor Registration Form</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <p>Page 2/3: Company location information</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-lg-6">
+            <form action="{{ url_for('views.registration_location') }}" method="POST" class="custom-form-border">
+
+                <div class="form-floating mb-4">
+                    <input type="text" class="form-control" name="address_1" id="address_1" 
+                        placeholder="Street Address 1"/> 
+                    <label for="address_1">Street Address 1</label>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input type="text" class="form-control" name="address_2" id="address_2" 
+                        placeholder="Street Address 2"/> 
+                    <label for="address_2">Street Address 2</label>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input type="text" class="form-control" name="city" id="city" 
+                        placeholder="City"/> 
+                    <label for="city">City</label>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input type="text" class="form-control" name="state" id="state" 
+                        placeholder="State"/> 
+                    <label for="state">State</label>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input type="text" class="form-control" name="zip_code" id="zip_code" 
+                        placeholder="Zip Code"/> 
+                    <label for="zip_code">Zip Code</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

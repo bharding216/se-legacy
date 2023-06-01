@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Application Submitted</title>
+</head>
+
+<body>
+    <h1>You have received a new application!</h1>
+
+    <hr>
+
+    <h2>Application Info</h2>
+        <ul>
+            <li><strong>Bid ID:</strong> {{ bid_object.id }}</li>
+            <li><strong>Bid Title:</strong> {{ bid_object.title }}</li>
+            <li><strong>Bid Close Date:</strong> {{ bid_object.close_date }}</li>
+            <li><strong>Supplier ID:</strong> {{ supplier_object.id }}</li>
+            <li><strong>Company Name:</strong> {{ supplier_object.company_name }}</li>
+        </ul>
+
+    <hr>
+    <p>To review the application documents, please login as Admin: (https://www.stxresources.org/login_admin)</p>
+
+    <p>Sent from South Texas Agency for Resources (https://www.stxresources.org)</p>
+</body>
+</html>

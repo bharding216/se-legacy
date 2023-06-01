@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}South Texas's Platform for Streamlined Project Bidding{% endblock %}
+
+{% block content %}
+
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+    <div class="container my-5">
+        {% for category, message in messages %}
+            {% if category == 'success' %}
+                <div class="alert alert-success mx-5" role="alert">
+                    {{ message }}
+                </div>
+            {% else %}
+                <div class="alert alert-danger mx-5" role="alert">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+
+
+
+<div class="pt-5 pb-5" style="min-height: 700px; position: relative;">
+    <div style="background: url('/static/homepage_bg.jpg') no-repeat center center fixed; 
+                background-size: cover; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;"></div>
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;
+                background: black; opacity: 0.2;"></div>
+    <div class="container pb-5" style="position: relative; z-index: 2; padding-top: 75px;">
+        <div class="row mb-5 justify-content-center">   
+            <div class="col-12">
+                <div class="text-center">
+                    <h1 style="color:white; font-weight: bold; letter-spacing: 2px;" class="pb-4">Welcome to the STAR Procurement Portal to Bidding and Contracting Opportunities in South Texas</h1>
+                    <h4 style="color:white; font-weight: 300; letter-spacing: 1px;">To Access the Portal, Vendors must register and create an account prior to responding to open solicitations</h4>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="row mb-3 pt-5" style="margin-top: 100px;">   
+            <div class="col-4 align-items-center justify-content-center d-flex">
+                <div class="text-center">
+                    <a href="{{ url_for('views.current_bids') }}">
+                        <button type="button" class="btn btn-reversed btn-lg" data-aos="fade-up">Current bids</button>
+                    </a>                  
+                </div>
+            </div>
+
+            <div class="col-4 align-items-center justify-content-center d-flex">
+                <div class="text-center">
+                    <a href="{{ url_for('views.closed_bids') }}">
+                        <button type="button" class="btn btn-reversed btn-lg" data-aos="fade-up">Closed bids</button>
+                    </a> 
+                </div>
+            </div>
+
+            <div class="col-4 align-items-center justify-content-center d-flex">
+                <div class="text-center">
+                    <a href="{{ url_for('views.awarded_bids') }}">
+                        <button type="button" class="btn btn-reversed btn-lg" data-aos="fade-up">Awarded bids</button>
+                    </a>                 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

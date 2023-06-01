@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Vendor Registration | South Texas Agency for Resources{% endblock %}
+
+{% block head %}
+<style>
+#ssn_div {
+  display: block;
+}
+
+#ein_div {
+  display: none;
+}
+
+#duns_div {
+  display: none;
+}
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        <div class="container my-5">
+            {% for category, message in messages %}
+                {% if category == 'success' %}
+                    <div class="alert alert-success mx-5" role="alert">
+                        {{ message }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger mx-5" role="alert">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1>Vendor Registration Form</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <p>Page 3/3: Company legal information</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-lg-6">
+            <form action="{{ url_for('views.registration_business') }}" method="POST" class="custom-form-border">
+
+                <div class="mb-3" id="radio_buttons_div">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="radio_type" 
+                            id="individual_radio" value="individual" checked>
+                        <label class="form-check-label" for="individual_radio">
+                        I'm an individual
+                        </label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="radio_type" 
+                        id="company_radio" value="company">
+                        <label class="form-check-label" for="company_radio">
+                        I'm with a company
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-floating mb-3" id="ssn_div">
+                    <input type="text" class="form-control" id="ssn" name="ssn"
+                        placeholder="SSN/TIN">
+                    <label for="ssn">SSN/TIN</label>
+                </div>
+
+                <div class="form-floating mb-3" id="ein_div">
+                    <input type="text" class="form-control" id="ein" name="ein"
+                        placeholder="EIN">
+                    <label for="ein">EIN</label>
+                </div>
+
+                <div class="form-floating mb-3" id="duns_div">
+                    <input type="text" class="form-control" id="duns" name="duns"
+                        placeholder="DUNS (optional)">
+                    <label for="duns">DUNS (optional)</label>
+                </div>
+
+
+                <div class="my-5">
+                    <select name="legal_structure" class="form-select" 
+                        style="width:auto" id="legal_structure">
+
+                        <option selected disabled="disabled">Choose a business structure</option>
+                        <option value="sole">Sole Proprietorship</option>
+                        <option value="partner">Partnership</option>
+                        <option value="corp">Corporation</option>
+                        <option value="s-corp">S Corporation</option>
+                        <option value="LLC">Limited Liability Company (LLC)</option>
+
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+  
+</div>
+
+
+
+<script>
+    const individualRadio = document.getElementById('individual_radio');
+    const companyRadio = document.getElementById('company_radio');
+    const ssnInput = document.getElementById('ssn_div');
+    const einInput = document.getElementById('ein_div');
+    const dunsInput = document.getElementById('duns_div');
+  
+    individualRadio.addEventListener('change', () => {
+      if (individualRadio.checked) {
+        ssnInput.style.display = 'block';
+        einInput.style.display = 'none';
+        dunsInput.style.display = 'none';
+      }
+    });
+  
+    companyRadio.addEventListener('change', () => {
+      if (companyRadio.checked) {
+        ssnInput.style.display = 'none';
+        einInput.style.display = 'block';
+        dunsInput.style.display = 'block';
+      }
+    });
+  </script>
+  
+
+
+{% endblock %}

@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Vendor Registration | South Texas Agency for Resources{% endblock %}
+
+{% block head %}
+<style>
+    .password-toggle-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    padding-right: 5px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    }
+
+
+    #password {
+    padding-right: 40px; /* Ensure enough space for the icon */
+    }
+
+    #togglePassword1 {
+    font-size: 1.25rem;
+    color: gray;
+    }
+
+    #togglePassword2 {
+    font-size: 1.25rem;
+    color: gray;
+    }
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        <div class="container my-5">
+            {% for category, message in messages %}
+                {% if category == 'success' %}
+                    <div class="alert alert-success mx-5" role="alert">
+                        {{ message }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger mx-5" role="alert">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1>Vendor Registration Form</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <p>Page 1/3: Basic company & account information</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 col-lg-6">
+            <form action="{{ url_for('views.registration_personal') }}" method="POST" class="custom-form-border">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="first_name"
+                        placeholder="Name" value="{{ first_name }}">
+                    <label for="first_name">First Name</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="last_name"
+                        placeholder="Name" value="{{ last_name }}">
+                    <label for="last_name">Last Name</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="company_name"
+                        placeholder="Company Name" value="{{ company_name }}">
+                    <label for="company_name">Company Name</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="email" name="email"
+                        placeholder="Email" value="{{ email }}">
+                    <label for="email">Email</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="tel" class="form-control" name="phone" id="phone" 
+                        placeholder="Phone Number" maxlength="12" value="{{ phone }}"> 
+                    <label for="phone">Phone Number</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" name="password1"
+                        placeholder="Password">
+                    <span class="password-toggle-icon toggle-password">
+                        <i class="fa-solid fa-eye" id="togglePassword1"></i>
+                    </span>
+                    <label for="password1">Password</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" name="password2"
+                        placeholder="Confirm Password">
+                    <span class="password-toggle-icon toggle-password">
+                        <i class="fa-solid fa-eye" id="togglePassword2"></i>
+                    </span>
+                    <label for="password2">Confirm Password</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const togglePassword1 = document.querySelector('#togglePassword1');
+    const password1 = document.querySelector('[name="password1"]');
+
+    togglePassword1.addEventListener('click', function (e) {
+        // toggle the type attribute
+        const type = password1.getAttribute('type') === 'password' ? 'text' : 'password';
+        password1.setAttribute('type', type);
+        // toggle the eye icon
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    const togglePassword2 = document.querySelector('#togglePassword2');
+    const password2 = document.querySelector('[name="password2"]');
+
+    togglePassword2.addEventListener('click', function (e) {
+        // toggle the type attribute
+        const type = password2.getAttribute('type') === 'password' ? 'text' : 'password';
+        password2.setAttribute('type', type);
+        // toggle the eye icon
+        this.classList.toggle('fa-eye-slash');
+    });
+
+</script>
+
+
+{% endblock %}

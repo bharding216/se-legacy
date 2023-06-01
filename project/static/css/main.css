@@ -1,0 +1,323 @@
+/*
+The color palette:
+Dark Brown: #582707
+Rust: #E2725B
+Tan: #FFB67D
+Cream: #FFFDD0
+Mustard: #FFDB58
+
+*/
+
+
+.wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .main-content {
+    flex: 1;
+  }
+  
+  
+  .footer {
+    margin-top: auto;
+  }
+  
+  .footer-links {
+    font-size: 14px;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    /* sans-serif is the fallback font */
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  p, .nav-link, .btn-primary, .footer,
+    select, th, td, li {
+    /* sans-serif is the fallback font */
+    font-family: 'Nunito', sans-serif;
+  }
+  
+  #zipcode, label {
+    font-family: 'Nunito', sans-serif;
+  }
+  
+  .navbar-custom {
+    background-color: #fffddf;
+  }
+  
+  .nav-link {
+    color: black;
+  }
+  
+  .nav-link:hover {
+    color: #E2725B;
+  }
+  
+  .navbar-toggler {
+    border: 1px solid black;
+  }
+  
+  
+  .btn-primary {
+    background-color: #582707;
+    border-color: black;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: #FFFDD0;
+    border-color: black;
+    color:black;
+  }
+
+  .btn-primary:focus {
+    background-color: #FFFDD0 !important;
+    border-color: black;
+    color:black;
+  }  
+  
+  .btn-reversed {
+    background-color: #fffddf;
+    border-color: black;
+    color: black;
+  }
+  
+  .btn-reversed:hover {
+    background-color: #FFB67D;
+    border-color: black;
+    color:black;
+  }
+  
+  
+  .footer {
+    background-color: #fffddf;
+  }
+  
+  .hover-link {
+    color: black;
+  }
+
+  .hover-link-blue {
+    color: blue;
+  }
+  
+  .hover-link:hover {
+    color: #E2725B;
+  }
+  
+  
+  .spaced {
+    margin-bottom: 30px;
+  }
+  
+  .padded {
+    padding: 0 80px;
+  }
+  
+  
+ 
+  .section_icon {
+    height: 100px;
+    width: auto;
+  }
+  
+  
+  
+  /*small screen*/
+  @media (max-width: 499px) {
+    #contract {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  
+    #scientists {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  
+    #build_website {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  
+    #lab_choice_table {
+      width: 600px;
+    }
+  
+    #lab_requests_table {
+      width: 1200px;
+    }
+  
+    #current_bids_table {
+      width: 1000px;
+    }
+  
+  }
+  
+  
+  /*medium-small screen*/
+  @media (min-width: 500px) {
+    .dropdown-menu {
+      margin-right: 50px;
+    }
+  
+    #contract {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  
+    #scientists {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  
+    #build_website {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  
+    #lab_choice_table {
+      width: 600px;
+    }
+  
+    #lab_requests_table {
+      width: 1200px;
+    }
+  
+    #current_bids_table {
+      width: 1000px;
+    }
+  
+  }
+  
+  /*medium screen*/
+  @media (min-width: 768px) {
+    .dropdown-menu {
+      margin-right: 50px;
+    }
+  
+    #contract {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  
+    #scientists {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  
+    #build_website {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  
+    .homepage-input-padding {
+      padding-left: 6rem;
+      padding-right: 6rem;
+    }
+  
+    #lab_choice_table {
+      width: 700px;
+    }
+  
+    #lab_requests_table {
+      width: 1200px;
+    }
+  
+    #current_bids_table {
+      width: 1000px;
+    }
+  
+    #lab_process_container {
+      max-width: 1000px; /* Set the maximum width as needed */
+      margin: 0 auto; /* Center the container */
+    }
+  
+    .footer-row {
+      width: 75%;
+      margin: 0 auto;
+  }
+  }
+  
+  
+  /*large screen*/
+  @media (min-width: 1024px) {
+    .dropdown-menu {
+      margin-right: 100px;
+    }
+  
+    .about-us-text {
+      font-size: 20px;
+    }
+  
+    #contract {
+      width: 400px;
+      height: auto;
+    }
+  
+    #scientists {
+      width: 500px;
+      height: auto;
+    }
+  
+    #build_website {
+      width: 400px;
+      height: auto;
+    }
+  
+    .homepage-input-padding {
+      padding-left: 10rem;
+      padding-right: 10rem;
+    }
+  
+    #lab_choice_table {
+      width: 1000px;
+    }
+  
+    #lab_requests_table {
+      width: 1200px;
+    }
+  
+    #current_bids_table {
+      max-width: 100%;
+    }
+  
+    .footer-row {
+      width: 60%;
+      margin: 0 auto;
+  }
+  }
+  
+  
+
+  .table-header-primary {
+    background-color: #ffcba4;
+  }
+  
+  .table thead th {
+    background-color: #ffcba4;
+  }
+  
+  
+  th {
+    background-color: #ffcba4;
+  }
+  
+  td {
+    border-bottom: 1px solid #ededed;
+    padding: 0 1rem;
+  }
+  
+  tr {
+    border-left: 1px solid #ededed;
+    border-right: 1px solid #ededed;
+    height: 5rem;
+  }
+
+  .custom-form-border {
+    border: 2px solid #ddd; /* Set border width and style */
+    border-radius: 5px; /* Add rounded corners if desired */
+    padding: 15px; /* Add padding for spacing */
+    }
