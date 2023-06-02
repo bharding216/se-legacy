@@ -66,11 +66,10 @@ def contact():
                 
                 if not error:
                     msg = Message('New Contact Form Submission',
-                                    sender = ("STAR", 'hello@stxresources.org'),
+                                    sender = ("SE Legacy", 'hello@selegacyconnect.org'),
                                     recipients = ['bharding80@gmail.com'
                                                 ]
                                     )
-                                    #'Micah@earl-law.com'
                     
 
                     msg.html = render_template('contact_email.html',
@@ -312,7 +311,7 @@ def manage_project():
                         aws_secret_access_key=os.getenv('s3_secret_access_key'))
         
         # Set the name of your S3 bucket
-        S3_BUCKET = 'star-uploads-bucket'
+        S3_BUCKET = 'se-legacy-bucket'
 
         for file in files:
             s3_filename = f"{secure_date_time_stamp}_{secure_filename(file.filename)}"
@@ -563,7 +562,7 @@ def apply_for_bid():
                         aws_access_key_id=os.getenv('s3_access_key_id'),
                         aws_secret_access_key=os.getenv('s3_secret_access_key'))
         
-        S3_BUCKET = 'star-uploads-bucket'
+        S3_BUCKET = 'se-legacy-bucket'
 
         for file in files:
             s3_filename = f"{secure_date_time_stamp}_{secure_filename(file.filename)}"
@@ -613,7 +612,7 @@ def apply_for_bid():
                                             .first()
 
             msg = Message('New Application Submission',
-                            sender = ("STAR", 'hello@stxresources.org'),
+                            sender = ("SE Legacy", 'hello@selegacyconnect.org'),
                             recipients = ['bharding80@gmail.com'
                                         ]
                             )
@@ -651,7 +650,7 @@ def download_application_doc():
                         aws_access_key_id=os.getenv('s3_access_key_id'),
                         aws_secret_access_key=os.getenv('s3_secret_access_key'))
 
-        S3_BUCKET = 'star-uploads-bucket'
+        S3_BUCKET = 'se-legacy-bucket'
 
         url = s3.generate_presigned_url(
             ClientMethod='get_object',
@@ -689,7 +688,7 @@ def delete_application_doc():
                     aws_access_key_id=os.getenv('s3_access_key_id'),
                     aws_secret_access_key=os.getenv('s3_secret_access_key'))
 
-    S3_BUCKET = 'star-uploads-bucket'
+    S3_BUCKET = 'se-legacy-bucket'
 
     s3.delete_object(Bucket=S3_BUCKET, Key=s3_filename)
 
@@ -739,7 +738,7 @@ def upload_doc():
                         aws_secret_access_key=os.getenv('s3_secret_access_key'))
         
         # Set the name of your S3 bucket
-        S3_BUCKET = 'star-uploads-bucket'
+        S3_BUCKET = 'se-legacy-bucket'
 
         for file in files:
             s3_filename = f"{secure_date_time_stamp}_{secure_filename(file.filename)}"
@@ -791,7 +790,7 @@ def download_project():
                         aws_access_key_id=os.getenv('s3_access_key_id'),
                         aws_secret_access_key=os.getenv('s3_secret_access_key'))
 
-        S3_BUCKET = 'star-uploads-bucket'
+        S3_BUCKET = 'se-legacy-bucket'
 
         url = s3.generate_presigned_url(
             ClientMethod='get_object',
@@ -844,7 +843,7 @@ def delete_doc():
                     aws_secret_access_key=os.getenv('s3_secret_access_key'))
 
     # Set the name of your S3 bucket
-    S3_BUCKET = 'star-uploads-bucket'
+    S3_BUCKET = 'se-legacy-bucket'
 
     s3.delete_object(Bucket=S3_BUCKET, Key=s3_filename)
 
@@ -888,7 +887,7 @@ def delete_project():
                             aws_secret_access_key=os.getenv('s3_secret_access_key'))
 
             # Set the name of your S3 bucket
-            S3_BUCKET = 'star-uploads-bucket'
+            S3_BUCKET = 'se-legacy-bucket'
 
             for record in project_meta_records_to_delete:
                 filename = record.title
@@ -1088,7 +1087,7 @@ def reset_password_request(user_type):
                                           )
 
             msg = Message('Password Reset Request', 
-                sender = ("STAR", 'hello@stxresources.org'),
+                sender = ("SE Legacy", 'hello@selegacyconnect.org'),
                 recipients = [email],
                 body=f'Reset your password by visiting the following link: {reset_password_url}')
 
