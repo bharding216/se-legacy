@@ -1,12 +1,12 @@
-/*
-The color palette:
-Dark Brown: #582707
-Rust: #E2725B
-Tan: #FFB67D
-Cream: #FFFDD0
-Mustard: #FFDB58
 
-*/
+
+:root {
+  --primary-color: #015B7E;
+  --secondary-color: #00A69C;
+  --white: #ffffff;
+  --off-white: #EDE7E3;
+  --accent-color: #FFA62B;
+}
 
 
 .wrapper {
@@ -44,7 +44,7 @@ Mustard: #FFDB58
   }
   
   .navbar-custom {
-    background-color: #fffddf;
+    background-color: var(--off-white);
   }
   
   .nav-link {
@@ -52,7 +52,7 @@ Mustard: #FFDB58
   }
   
   .nav-link:hover {
-    color: #E2725B;
+    color: var(--accent-color);
   }
   
   .navbar-toggler {
@@ -61,38 +61,38 @@ Mustard: #FFDB58
   
   
   .btn-primary {
-    background-color: #582707;
+    background-color: var(--primary-color);
     border-color: black;
-    color: white;
+    color: var(--white);
   }
   
   .btn-primary:hover {
-    background-color: #FFFDD0;
+    background-color: var(--secondary-color);
     border-color: black;
-    color:black;
+    color: var(--white);
   }
 
   .btn-primary:focus {
-    background-color: #FFFDD0 !important;
+    background-color: var(--secondary-color) !important;
     border-color: black;
-    color:black;
+    color: var(--white);
   }  
   
   .btn-reversed {
-    background-color: #fffddf;
+    background-color: var(--off-white);
     border-color: black;
     color: black;
   }
   
   .btn-reversed:hover {
-    background-color: #FFB67D;
+    background-color: var(--accent-color);
     border-color: black;
     color:black;
   }
   
   
   .footer {
-    background-color: #fffddf;
+    background-color: var(--off-white);
   }
   
   .hover-link {
@@ -104,7 +104,7 @@ Mustard: #FFDB58
   }
   
   .hover-link:hover {
-    color: #E2725B;
+    color: lightblue;
   }
   
   

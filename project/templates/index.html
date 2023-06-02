@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}South Texas's Platform for Streamlined Project Bidding{% endblock %}
+{% block title %}SE Legacy - The Ultimate Platform for Streamlined Project Bidding{% endblock %}
 
 {% block content %}
 
@@ -43,26 +43,26 @@
 
 
         <div class="row mb-3 pt-5" style="margin-top: 100px;">   
-            <div class="col-4 align-items-center justify-content-center d-flex">
+            <div class="col-12 col-sm-4 mb-4 mb-sm-0 align-items-center justify-content-center d-flex">
                 <div class="text-center">
                     <a href="{{ url_for('views.current_bids') }}">
-                        <button type="button" class="btn btn-reversed btn-lg" data-aos="fade-up">Current bids</button>
+                        <button type="button" class="btn btn-reversed" data-aos="fade-right" data-aos-delay="100">Current bids</button>
                     </a>                  
                 </div>
             </div>
 
-            <div class="col-4 align-items-center justify-content-center d-flex">
+            <div class="col-12 col-sm-4 mb-4 mb-sm-0 align-items-center justify-content-center d-flex">
                 <div class="text-center">
                     <a href="{{ url_for('views.closed_bids') }}">
-                        <button type="button" class="btn btn-reversed btn-lg" data-aos="fade-up">Closed bids</button>
+                        <button type="button" class="btn btn-reversed" data-aos="fade-right" data-aos-delay="250">Closed bids</button>
                     </a> 
                 </div>
             </div>
 
-            <div class="col-4 align-items-center justify-content-center d-flex">
+            <div class="col-12 col-sm-4 mb-4 mb-sm-0 align-items-center justify-content-center d-flex">
                 <div class="text-center">
                     <a href="{{ url_for('views.awarded_bids') }}">
-                        <button type="button" class="btn btn-reversed btn-lg" data-aos="fade-up">Awarded bids</button>
+                        <button type="button" class="btn btn-reversed" data-aos="fade-right" data-aos-delay="400">Awarded bids</button>
                     </a>                 
                 </div>
             </div>
