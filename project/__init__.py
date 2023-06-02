@@ -15,7 +15,7 @@ mail = Mail()
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__) # Initialize the app object
 
     load_dotenv()
 
@@ -88,6 +88,10 @@ def create_app():
             else:
                 user = None
             return user
+
+        @app.before_first_request
+        def set_user_type():
+            session['user_type'] = None
 
         @app.before_request
         def redirect_to_https():

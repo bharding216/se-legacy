@@ -4,10 +4,6 @@ from flask import session
 
 app = create_app()
 
-@app.before_first_request
-def set_user_type():
-    session['user_type'] = None
-
 if __name__ == '__main__':
     if 'DYNO' in os.environ:
         # Running on Heroku, use gunicorn
