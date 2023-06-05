@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}SE Legacy - The Ultimate Platform for Streamlined Project Bidding{% endblock %}
+{% block title %}South Texas's Platform for Streamlined Project Bidding{% endblock %}
 
 {% block content %}
 
@@ -22,7 +22,7 @@
     </div>
 {% endif %}
 {% endwith %}
-    
+
 
 
 <div class="pt-5 pb-5" style="min-height: 700px; position: relative;">
@@ -34,7 +34,7 @@
         <div class="row mb-5 justify-content-center">   
             <div class="col-12">
                 <div class="text-center">
-                    <h1 style="color:white; font-weight: bold; letter-spacing: 2px;" class="pb-4">Welcome to the SE Legacy Bidding & Procurement Portal</h1>
+                    <h1 style="color:white; font-weight: bold; letter-spacing: 2px;" class="pb-4">Welcome to the STAR Procurement Portal to Bidding and Contracting Opportunities in South Texas</h1>
                     <h4 style="color:white; font-weight: 300; letter-spacing: 1px;">To Access the Portal, Vendors must register and create an account prior to responding to open solicitations</h4>
                 </div>
             </div>
@@ -43,26 +43,26 @@
 
 
         <div class="row mb-3 pt-5" style="margin-top: 100px;">   
-            <div class="col-12 col-sm-4 mb-4 mb-sm-0 align-items-center justify-content-center d-flex">
+            <div class="col-4 align-items-center justify-content-center d-flex">
                 <div class="text-center">
                     <a href="{{ url_for('views.current_bids') }}">
-                        <button type="button" class="btn btn-reversed" data-aos="fade-right" data-aos-delay="100">Current bids</button>
+                        <button type="button" class="btn btn-reversed btn-lg" data-aos="fade-up">Current bids</button>
                     </a>                  
                 </div>
             </div>
 
-            <div class="col-12 col-sm-4 mb-4 mb-sm-0 align-items-center justify-content-center d-flex">
+            <div class="col-4 align-items-center justify-content-center d-flex">
                 <div class="text-center">
                     <a href="{{ url_for('views.closed_bids') }}">
-                        <button type="button" class="btn btn-reversed" data-aos="fade-right" data-aos-delay="250">Closed bids</button>
+                        <button type="button" class="btn btn-reversed btn-lg" data-aos="fade-up">Closed bids</button>
                     </a> 
                 </div>
             </div>
 
-            <div class="col-12 col-sm-4 mb-4 mb-sm-0 align-items-center justify-content-center d-flex">
+            <div class="col-4 align-items-center justify-content-center d-flex">
                 <div class="text-center">
                     <a href="{{ url_for('views.awarded_bids') }}">
-                        <button type="button" class="btn btn-reversed" data-aos="fade-right" data-aos-delay="400">Awarded bids</button>
+                        <button type="button" class="btn btn-reversed btn-lg" data-aos="fade-up">Awarded bids</button>
                     </a>                 
                 </div>
             </div>
