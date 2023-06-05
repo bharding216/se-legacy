@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}View Vendor Chat | SE Legacy{% endblock %}
+
+
+{% block content %}
+
+<div class="container my-5">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'success' %}
+                    <div class="alert alert-success mx-5" role="alert">
+                        {{ message }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger mx-5" role="alert">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+
+
+
+
+
+{% if user.is_authenticated and session['user_type'] == 'admin' %}
+<div class="container my-5">
+    <h4 class="pb-3">Chat History</h4>
+
+    {% if chat_history_records|length == 0 %}
+
+        <p>There are no messages yet.</p>
+
+    {% else %}
+
+        <div id="chat_history">
+            <div style="width: 800px; overflow-x: auto;" class="mx-auto">
+                <table style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th class="text-center align-middle" scope="col" style="width: 100px;">Author</th>
+                            <th class="text-center align-middle" scope="col" style="width: 300px; padding: 0px 20px;">Comment</th>
+                            <th class="text-center align-middle" scope="col" style="width: 250px; padding: 0px 0px;">Date/Time (CST)</th>
+                        </tr>
+                    </thead>
+        
+                    <tbody>
+                        {% for record in chat_history_records %}
+                            <tr>
+                                <td class="text-center align-middle" style="width: 100px; padding-left: 10px;">{{ record.author_type }}</td>
+                                <td class="text-center align-middle" style="width: 200px; padding: 0px 20px;">{{ record.comment }}</td>
+                                <td class="text-center align-middle" style="width: 200px; padding: 0px 20px;">{{ record.datetime_stamp.strftime('%b-%d-%Y %I:%M %p') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% endif %}
+
+
+            <div class="container my-5" style="width: 800px;">
+                <form action="{{ url_for('views.post_chat_message') }}" method="POST">
+                    <div class="row justify-content-center">
+                        <div class="col-6">
+                            <textarea class="form-control" placeholder="Message" aria-label="Message" aria-describedby="basic-addon2" 
+                            name="message" required></textarea>
+                        </div>       
+
+                        <input type="hidden" name="bid_id" value="{{ bid_id }}">
+                        <input type="hidden" name="supplier_id" value="{{ supplier_id }}">
+
+                        <div class="col-4 d-flex justify-content-center align-items-center">
+                            <button class="btn btn-primary" 
+                                    type="submit" style="height: auto;">Add message</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+</div>
+{% endif %}
+
+
+
+
+
+
+{% endblock %}

@@ -1,4 +1,5 @@
 from flask import url_for, current_app, request
+import pytz
 
 def generate_sitemap():
     with current_app.app_context():
@@ -13,4 +14,15 @@ def generate_sitemap():
         sitemap_xml += '</urlset>\n'
         return sitemap_xml
     
+# Here are the 'pytz' docs: https://pytz.sourceforge.net/
+def utc_to_central(datetime_utc):
+    utc_timezone = pytz.timezone('UTC')
+    central_timezone = pytz.timezone('US/Central')
+    datetime_central = datetime_utc.replace(tzinfo=pytz.utc).astimezone(central_timezone)
+    return datetime_central
 
+def central_to_utc(datetime_central):
+    utc_timezone = pytz.timezone('UTC')
+    central_timezone = pytz.timezone('US/Central')
+    datetime_utc = datetime_central.replace(tzinfo=central_timezone).astimezone(utc_timezone)
+    return datetime_utc

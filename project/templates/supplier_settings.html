@@ -108,6 +108,97 @@
                         </td>
                     </tr>
 
+                    <tr>
+                        <td class="text-center align-middle"><b>Address 1</b></td>
+                        <td class="text-center align-middle">{{ user.supplier.address_1 }}</td>
+                        <td class="text-center align-middle">
+                            <form action="{{ url_for('views.supplier_settings') }}" method="POST">
+                                <input type="hidden" name="field_name" value="address_1">
+                                <input type="submit" class="btn btn-primary my-1" value="Edit">
+                            </form>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="text-center align-middle"><b>Address 2</b></td>
+                        <td class="text-center align-middle">{{ user.supplier.address_2 }}</td>
+                        <td class="text-center align-middle">
+                            <form action="{{ url_for('views.supplier_settings') }}" method="POST">
+                                <input type="hidden" name="field_name" value="address_2">
+                                <input type="submit" class="btn btn-primary my-1" value="Edit">
+                            </form>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="text-center align-middle"><b>City</b></td>
+                        <td class="text-center align-middle">{{ user.supplier.city }}</td>
+                        <td class="text-center align-middle">
+                            <form action="{{ url_for('views.supplier_settings') }}" method="POST">
+                                <input type="hidden" name="field_name" value="city">
+                                <input type="submit" class="btn btn-primary my-1" value="Edit">
+                            </form>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="text-center align-middle"><b>State</b></td>
+                        <td class="text-center align-middle">{{ user.supplier.state }}</td>
+                        <td class="text-center align-middle">
+                            <form action="{{ url_for('views.supplier_settings') }}" method="POST">
+                                <input type="hidden" name="field_name" value="state">
+                                <input type="submit" class="btn btn-primary my-1" value="Edit">
+                            </form>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="text-center align-middle"><b>Zip Code</b></td>
+                        <td class="text-center align-middle">{{ user.supplier.zip_code }}</td>
+                        <td class="text-center align-middle">
+                            <form action="{{ url_for('views.supplier_settings') }}" method="POST">
+                                <input type="hidden" name="field_name" value="zip_code">
+                                <input type="submit" class="btn btn-primary my-1" value="Edit">
+                            </form>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="text-center align-middle"><b>Legal Type</b></td>
+                        <td class="text-center align-middle">{{ user.supplier.legal_type }}</td>
+                        <td class="text-center align-middle">
+                            <form action="{{ url_for('views.supplier_settings') }}" method="POST">
+                                <input type="hidden" name="field_name" value="legal_type">
+                                <input type="submit" class="btn btn-primary my-1" value="Edit">
+                            </form>
+                        </td>
+                    </tr>
+
+                    {% if user.supplier.ssn is not none %}
+                    <tr>
+                        <td class="text-center align-middle"><b>SSN</b></td>
+                        <td class="text-center align-middle">{{ user.supplier.ssn }}</td>
+                        <td class="text-center align-middle">
+                            <form action="{{ url_for('views.supplier_settings') }}" method="POST">
+                                <input type="hidden" name="field_name" value="ssn">
+                                <input type="submit" class="btn btn-primary my-1" value="Edit">
+                            </form>
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                    {% if user.supplier.ein is not none %}
+                    <tr>
+                        <td class="text-center align-middle"><b>EIN</b></td>
+                        <td class="text-center align-middle">{{ user.supplier.ein }}</td>
+                        <td class="text-center align-middle">
+                            <form action="{{ url_for('views.supplier_settings') }}" method="POST">
+                                <input type="hidden" name="field_name" value="ein">
+                                <input type="submit" class="btn btn-primary my-1" value="Edit">
+                            </form>
+                        </td>
+                    </tr>
+                    {% endif %}
 
             </tbody>
 

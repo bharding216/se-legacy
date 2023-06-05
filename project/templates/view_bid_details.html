@@ -285,6 +285,39 @@
 
 {% if user.is_authenticated and session['user_type'] == 'admin' %}
     {% if applications_for_bid|length != 0 %}
+    <div class="pb-5">
+        <div class="container" style="overflow-x: auto;">
+            <h4 class="mb-3">Vendor Chats</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center align-middle" scope="col" style="width: 150px; padding-left: 10px;">Supplier ID</th>
+                        <th class="text-center align-middle" scope="col" style="width: 200px; padding: 0px 20px;">Company Name</th>
+                        <th class="text-center align-middle" scope="col" style="width: 150px; padding: 0px 20px;">View Chat</th>
+                    </tr>
+                </thead>
+        
+                <tbody>
+                    {% for supplier_id, company_name in vendor_chat_list.items() %}
+                        <tr>
+                            <td class="text-center align-middle" style="padding-left: 10px;">{{ supplier_id }}</td>
+                            <td class="text-center align-middle" style="width: 300px; padding: 0px 10px 0px 10px;">{{ company_name }}</td>
+                            <td class="text-center align-middle">
+                                <form action="{{ url_for('views.view_vendor_chats', bid_id=bid_object.id, supplier_id=supplier_id) }}" method="POST">
+                                    <button type="submit" 
+                                        class="btn btn-primary"
+                                        style="width:auto">
+                                        Select
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>   
+
         <div class="pb-5">
             <div class="container" style="overflow-x: auto;">
                 <h4 class="mb-3">Applications Received</h4>

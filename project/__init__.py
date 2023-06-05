@@ -7,6 +7,7 @@ from flask_mail import Mail
 import os
 from helpers import generate_sitemap
 from dotenv import load_dotenv
+import logging
 
 
 db = SQLAlchemy()
@@ -73,7 +74,7 @@ def create_app():
 
         db.create_all()
 
-        login_manager.login_view = "views.login"
+        login_manager.login_view = "views.login_vendor"
         login_manager.login_message = ""
         login_manager.login_message_category = "error"
         login_manager.init_app(app)
@@ -98,5 +99,7 @@ def create_app():
             # Ensure that all requests are secure (HTTPS)
             if not request.is_secure and request.host != 'localhost:2000':
                 return redirect(request.url.replace('http://', 'https://'), code=301)
+
+        logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
         return app

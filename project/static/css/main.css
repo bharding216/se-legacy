@@ -293,16 +293,19 @@
   
 
   .table-header-primary {
-    background-color: #ffcba4;
+    background-color: var(--primary-color);
+    color: var(--white);
   }
   
   .table thead th {
-    background-color: #ffcba4;
+    background-color: var(--primary-color);
+    color: var(--white);
   }
   
   
   th {
-    background-color: #ffcba4;
+    background-color: var(--primary-color);
+    color: var(--white);
   }
   
   td {
