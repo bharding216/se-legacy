@@ -622,7 +622,13 @@ def apply_for_bid():
         bid_id = request.form['bid_id']
         bid = bids.query.get(bid_id)
         close_date_utc = bid.close_date
-        supplier_id = current_user.supplier_id
+
+        if current_user.supplier_id:
+            supplier_id = current_user.supplier_id
+        else: # user is logged in as admin
+            flash('Please log in as a vendor to apply to this bid.', category='error')
+            return redirect(url_for('views.view_bid_details', bid_id=bid_id))
+        
         now = datetime.datetime.utcnow()
 
         logging.info('close_date_utc: %s', close_date_utc)
@@ -631,7 +637,7 @@ def apply_for_bid():
         logging.info('bid object: %s', bid)
 
         if close_date_utc < now: # all times in UTC
-            flash('The close date for this bid has passed.', category='error')
+            flash('The close date for this bid has passed. Please contact us if you have any questions.', category='error')
             return redirect(url_for('views.view_bid_details', bid_id=bid_id))
 
         date_time_stamp = now.strftime("%Y-%m-%d %H:%M:%S")      
@@ -663,59 +669,60 @@ def apply_for_bid():
               contact you via email or phone with next steps. Scroll down to view your application documents.', \
                 category='success')
 
-        with db.session() as db_session:
-            applications_for_bid_and_supplier = db_session.query(applicant_docs) \
-                                                        .filter_by(bid_id = bid_id) \
-                                                        .filter(applicant_docs.supplier_id == supplier_id) \
-                                                        .all()
+        # applications_for_bid_and_supplier = db_session.query(applicant_docs) \
+        #                                             .filter_by(bid_id = bid_id) \
+        #                                             .filter(applicant_docs.supplier_id == supplier_id) \
+        #                                             .all()
 
-            if applications_for_bid_and_supplier is not None:
-                applied_status = 'applied'
-            else:
-                applied_status = 'not applied'
+        # if applications_for_bid_and_supplier is not None:
+        #     applied_status = 'applied'
+        # else:
+        #     applied_status = 'not applied'
 
-            bid_object = db_session.query(bids) \
-                                .filter_by(id = bid_id) \
-                                .first()
+        # project_meta_records = db_session.query(project_meta) \
+        #                                 .filter_by(bid_id = bid_object.id) \
+        #                                 .all()
 
-            project_meta_records = db_session.query(project_meta) \
-                                            .filter_by(bid_id = bid_object.id) \
-                                            .all()
+        # applications_for_bid = db_session.query(applicant_docs) \
+        #                                 .filter_by(bid_id = bid_object.id) \
+        #                                 .all()
 
-            applications_for_bid = db_session.query(applicant_docs) \
-                                            .filter_by(bid_id = bid_object.id) \
-                                            .all()
+        bid_object = db_session.query(bids) \
+                            .filter_by(id = bid_id) \
+                            .first()
 
-            supplier_object = db_session.query(supplier_info) \
-                                            .filter_by(id = supplier_id) \
-                                            .first()
+        supplier_object = db_session.query(supplier_info) \
+                                        .filter_by(id = supplier_id) \
+                                        .first()
 
-            msg = Message('New Application Submission',
-                            sender = ("SE Legacy", 'hello@selegacyconnect.org'),
-                            recipients = ['bharding80@gmail.com'
-                                        ]
-                            )
-                                    #'Micah@earl-law.com'
-            
-            msg.html = render_template('new_application_email.html',
-                                    bid_object = bid_object,
-                                    supplier_object = supplier_object
-                                    )
+        msg = Message('New Application Submission',
+                        sender = ("SE Legacy", 'hello@selegacyconnect.org'),
+                        recipients = ['bharding80@gmail.com'
+                                    ]
+                        )
+                                #'Micah@earl-law.com'
+        
+        msg.html = render_template('new_application_email.html',
+                                bid_object = bid_object,
+                                supplier_object = supplier_object
+                                )
 
-            mail.send(msg)
+        mail.send(msg)
+
+        return redirect(url_for('views.view_bid_details', bid_id=bid_id))
+    
+        # return render_template('view_bid_details.html', 
+        #                         user = current_user,
+        #                         bid_object = bid_object,
+        #                         project_meta_records = project_meta_records,
+        #                         applied_status = applied_status,
+        #                         applications_for_bid_and_supplier = applications_for_bid_and_supplier,
+        #                         applications_for_bid = applications_for_bid,
+        #                         supplier_object = supplier_object
+        #                         )
 
 
-            return render_template('view_bid_details.html', 
-                                    user = current_user,
-                                    bid_object = bid_object,
-                                    project_meta_records = project_meta_records,
-                                    applied_status = applied_status,
-                                    applications_for_bid_and_supplier = applications_for_bid_and_supplier,
-                                    applications_for_bid = applications_for_bid,
-                                    supplier_object = supplier_object
-                                    )
-
-    else:
+    else: # user is trying to send a GET request
         logging.info('User trying to send a GET request to "apply-for-bid" view function.')
         return 'This URL only accepts POST requests. Please return to the SE Legacy homepage.'
 
@@ -829,7 +836,6 @@ def upload_doc():
         secure_date_time_stamp = secure_filename(date_time_stamp)
         user_id = current_user.id
 
-
         # Configure S3 credentials
         s3 = boto3.client('s3', region_name='us-east-1',
                         aws_access_key_id=os.getenv('s3_access_key_id'),
@@ -856,19 +862,8 @@ def upload_doc():
 
         flash('File(s) uploaded successfully!', 'success')
 
-        with db.session() as db_session:
-            bid_object = db_session.query(bids) \
-                                .filter_by(id = bid_id) \
-                                .first()
-
-            project_meta_records = db_session.query(project_meta) \
-                                            .filter_by(bid_id = bid_object.id) \
-                                            .all()
-
-            return render_template('view_bid_details.html', 
-                                    user = current_user,
-                                    bid_object = bid_object,
-                                    project_meta_records = project_meta_records)
+        return redirect(url_for('views.view_bid_details',
+                                bid_id = bid_id))
 
 
 
@@ -1006,10 +1001,7 @@ def delete_project():
             bid_list = db_session.query(bids).all()
 
             flash('Project successfully deleted!', category='error')
-            return render_template('manage_project.html',
-                                user = current_user,
-                                bid_list = bid_list
-                                )
+            return redirect(url_for('views.manage_project', user = current_user))
 
 
 
