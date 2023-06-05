@@ -355,10 +355,15 @@ def manage_project():
     with db.session() as db_session:
         bid_list = db_session.query(bids).all()
 
-    return render_template('manage_project.html',
-                           user = current_user,
-                           bid_list = bid_list
-                           )
+        for bid in bid_list:
+            close_date_utc = bid.close_date
+            close_date_central = utc_to_central(close_date_utc)
+            bid.close_date = close_date_central
+
+        return render_template('manage_project.html',
+                            user = current_user,
+                            bid_list = bid_list
+                            )
 
 
 @views.route('/view-bid-details/<int:bid_id>', methods=['GET', 'POST'])
@@ -1076,6 +1081,11 @@ def current_bids():
     db.session.commit()
 
     open_bids = bids.query.filter(bids.status == 'open').all()
+
+    for bid in open_bids:
+        close_date_utc = bid.close_date
+        close_date_central = utc_to_central(close_date_utc)
+        bid.close_date = close_date_central
 
     return render_template('current_bids.html',
                         open_bids = open_bids,
