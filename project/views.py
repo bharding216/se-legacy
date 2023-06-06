@@ -16,6 +16,7 @@ from werkzeug.utils import secure_filename
 from itsdangerous.exc import BadSignature
 from itsdangerous.url_safe import URLSafeSerializer
 import os
+import base64
 import uuid
 import string
 import shutil
@@ -32,6 +33,15 @@ views = Blueprint('views', __name__)
 
 @views.route('/', methods=['GET', 'POST'])
 def index():
+
+    fernet_key = Fernet.generate_key()
+
+    # Encode the Fernet key with URL-safe base64 encoding
+    url_safe_fernet_key = base64.urlsafe_b64encode(fernet_key).decode()
+
+    # Print the generated URL-safe Fernet key
+    print(url_safe_fernet_key)
+
     return render_template('index.html',
                            user = current_user
                            )
@@ -197,25 +207,17 @@ def registration_business():
         legal_structure = request.form['legal_structure']
         session['legal_structure'] = legal_structure
 
-        encryption_key=os.getenv('encryption_key')
+        current_time = datetime.datetime.now().time()
+        current_time_str = current_time.strftime('%H:%M:%S')
+        s = URLSafeSerializer(os.getenv('secret_key'))
 
         radio_type = request.form['radio_type']
         if radio_type == 'individual':
             ssn = request.form['ssn']
-            cipher = Fernet(encryption_key)
-            ssn_bytes = ssn.encode()
-            encrypted_ssn = cipher.encrypt(ssn_bytes)
-            session['ssn'] = encrypted_ssn
-            logging.info('encrypted_ssn: %s', encrypted_ssn)
+            ssn_serialized = s.dumps([ssn, current_time_str])
 
-            # # Retrieving and decrypting an SSN
-            # # Retrieve the encrypted SSN from the database
-
-            # # Decrypt the encrypted SSN using the Fernet cipher
-            # decrypted_ssn = cipher.decrypt(encrypted_ssn)
-
-            # # Convert the decrypted SSN bytes back to string format
-            # decrypted_ssn_str = decrypted_ssn.decode()
+            session['ssn'] = ssn_serialized
+            logging.info('ssn_serialized: %s', ssn_serialized)
 
             with db.session() as db_session:
                 new_supplier_info_record = supplier_info(first_name = session['first_name'],
@@ -248,22 +250,18 @@ def registration_business():
         if radio_type == 'company':
             ein = request.form['ein']
             if ein:
-                cipher = Fernet(encryption_key)
-                ein_bytes = ein.encode()
-                encrypted_ein = cipher.encrypt(ein_bytes)
-                session['ein'] = encrypted_ein
+                ein_serialized = s.dumps([ein, current_time_str])
+                session['ein'] = ein_serialized
                 session['duns'] = ""
-                logging.info('encrypted_ein: %s', encrypted_ein)
+                logging.info('serialized_ein: %s', ein_serialized)
                 logging.info('duns record is not applicable for this user')
 
             duns = request.form['duns']
             if duns:
-                cipher = Fernet(encryption_key)
-                duns_bytes = duns.encode()
-                encrypted_duns = cipher.encrypt(duns_bytes)
-                session['duns'] = encrypted_duns
+                duns_serialized = s.dumps([duns, current_time_str])
+                session['duns'] = duns_serialized
                 session['ein'] = ""
-                logging.info('encrypted_duns: %s', encrypted_duns)
+                logging.info('serialized_duns: %s', duns_serialized)
                 logging.info('ein record is not applicable for this user')
 
             with db.session() as db_session:
