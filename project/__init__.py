@@ -1,3 +1,4 @@
+from datetime import timedelta
 from flask import Flask, session, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user
@@ -28,6 +29,7 @@ def create_app():
     app.config['MYSQL_DB'] = os.getenv('mysql_db')
     app.config['SECRET_KEY'] = os.getenv('secret_key')
     app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
     app.config['SESSION_COOKIE_SECURE'] = True
     #app.config['SESSION_COOKIE_NAME'] = 'my_session_cookie'
     Session(app)

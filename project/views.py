@@ -477,6 +477,7 @@ def view_bid_details(bid_id):
                 supplier_info_data = db.session.query(supplier_info.id, supplier_info.company_name).\
                     filter(supplier_info.id.in_(supplier_ids)).all()
                 vendor_chat_list = {supplier_id: company_name for supplier_id, company_name in supplier_info_data}
+                logging.info('vendor_chat_list: %s', vendor_chat_list)
 
         else: # user is not logged in
             applied_status = 'not applied'
