@@ -25,6 +25,7 @@ import requests
 from io import BytesIO
 from werkzeug.datastructures import Headers
 import logging
+from cryptography.fernet import Fernet
 
 
 views = Blueprint('views', __name__)
@@ -196,10 +197,25 @@ def registration_business():
         legal_structure = request.form['legal_structure']
         session['legal_structure'] = legal_structure
 
+        encryption_key=os.getenv('encryption_key')
+
         radio_type = request.form['radio_type']
         if radio_type == 'individual':
             ssn = request.form['ssn']
-            session['ssn'] = ssn
+            cipher = Fernet(encryption_key)
+            ssn_bytes = ssn.encode()
+            encrypted_ssn = cipher.encrypt(ssn_bytes)
+            session['ssn'] = encrypted_ssn
+            logging.info('encrypted_ssn: %s', encrypted_ssn)
+
+            # # Retrieving and decrypting an SSN
+            # # Retrieve the encrypted SSN from the database
+
+            # # Decrypt the encrypted SSN using the Fernet cipher
+            # decrypted_ssn = cipher.decrypt(encrypted_ssn)
+
+            # # Convert the decrypted SSN bytes back to string format
+            # decrypted_ssn_str = decrypted_ssn.decode()
 
             with db.session() as db_session:
                 new_supplier_info_record = supplier_info(first_name = session['first_name'],
@@ -215,6 +231,7 @@ def registration_business():
                                                         ssn = session['ssn'],
                                                         legal_type = session['legal_structure']
                                                         )
+                logging.info('new_supplier_info_record: %s', new_supplier_info_record)
                 db_session.add(new_supplier_info_record)
                 db_session.commit()
                 
@@ -226,12 +243,28 @@ def registration_business():
                                                         )
                 db_session.add(new_supplier_login_record)
                 db_session.commit()
+                logging.info('new supplier login record created!')
 
         if radio_type == 'company':
             ein = request.form['ein']
+            if ein:
+                cipher = Fernet(encryption_key)
+                ein_bytes = ein.encode()
+                encrypted_ein = cipher.encrypt(ein_bytes)
+                session['ein'] = encrypted_ein
+                session['duns'] = ""
+                logging.info('encrypted_ein: %s', encrypted_ein)
+                logging.info('duns record is not applicable for this user')
+
             duns = request.form['duns']
-            session['ein'] = ein
-            session['duns'] = duns
+            if duns:
+                cipher = Fernet(encryption_key)
+                duns_bytes = duns.encode()
+                encrypted_duns = cipher.encrypt(duns_bytes)
+                session['duns'] = encrypted_duns
+                session['ein'] = ""
+                logging.info('encrypted_duns: %s', encrypted_duns)
+                logging.info('ein record is not applicable for this user')
 
             with db.session() as db_session:
                 new_supplier_info_record = supplier_info(first_name = session['first_name'],
@@ -249,6 +282,7 @@ def registration_business():
                                                         legal_type = session['legal_structure']
                                                         )
             
+                logging.info('new_supplier_info_record: %s', new_supplier_info_record)
                 db_session.add(new_supplier_info_record)
                 db_session.commit()
 
@@ -260,6 +294,7 @@ def registration_business():
                                                         )
                 db_session.add(new_supplier_login_record)
                 db_session.commit()
+                logging.info('new supplier login record created!')
 
         flash('New supplier profile created! Please login using your email and password to \
               apply for open bids.', category='success')
@@ -1154,19 +1189,20 @@ def login_vendor():
 
         user = supplier_login.query.filter_by(email = email).first()
 
-        logging.info('email: %s', email)
-        logging.info('suppler_id: %s', user.supplier_id)
-
         if user:
+            logging.info('user trying to log in with email: %s', email)
             if check_password_hash(user.password, password):
                 login_user(user, remember = True)
                 session['user_type'] = 'supplier'
+                logging.info('suppler_id: %s', user.supplier_id)
                 session.permanent = True
                 flash('Login successful!', category = 'success')
                 return redirect(url_for('views.index'))
             else:
                 flash('Incorrect password. Please try again.', category = 'error')
-                return redirect(url_for('views.login_vendor', email = email))
+                return render_template('login_vendor.html',
+                                       email = email,
+                                       user = current_user)
         else:
             flash('That email is not associated with an account.', category = 'error')
 
