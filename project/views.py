@@ -33,15 +33,6 @@ views = Blueprint('views', __name__)
 
 @views.route('/', methods=['GET', 'POST'])
 def index():
-
-    fernet_key = Fernet.generate_key()
-
-    # Encode the Fernet key with URL-safe base64 encoding
-    url_safe_fernet_key = base64.urlsafe_b64encode(fernet_key).decode()
-
-    # Print the generated URL-safe Fernet key
-    print(url_safe_fernet_key)
-
     return render_template('index.html',
                            user = current_user
                            )
