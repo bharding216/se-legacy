@@ -725,19 +725,32 @@ def apply_for_bid():
                                         .filter_by(id = supplier_id) \
                                         .first()
 
-        msg = Message('New Application Submission',
+        admin_msg = Message('New Application Submitted',
                         sender = ("SE Legacy", 'hello@selegacyconnect.org'),
                         recipients = ['bharding80@gmail.com'
                                     ]
                         )
-                                #'Micah@earl-law.com'
         
-        msg.html = render_template('new_application_email.html',
+        admin_msg.html = render_template('new_application_email.html',
+                                bid_object = bid_object,
+                                supplier_object = supplier_object
+                                )
+        
+        mail.send(admin_msg)
+
+        msg_to_vendor = Message('Thank You For Applying',
+                        sender = ("SE Legacy", 'hello@selegacyconnect.org'),
+                        recipients = [supplier_object.email
+                                    ]
+                        )
+
+        msg_to_vendor.html = render_template('new_app_email_to_vendor.html',
                                 bid_object = bid_object,
                                 supplier_object = supplier_object
                                 )
 
-        mail.send(msg)
+        mail.send(msg_to_vendor)
+
 
         return redirect(url_for('views.view_bid_details', bid_id=bid_id))
     
