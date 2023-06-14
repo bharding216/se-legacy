@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}SE Legacy | Admin Data View{% endblock %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+    <div class="container my-5">
+        {% for category, message in messages %}
+            {% if category == 'success' %}
+                <div class="alert alert-success mx-5" role="alert">
+                    {{ message }}
+                </div>
+            {% else %}
+                <div class="alert alert-danger mx-5" role="alert">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+
+
+<div class="container my-5">
+
+    <h3 class="mb-5">Admin Data View</h3>
+
+    <a href="{{ url_for('views.download_vendor_list') }}" class="btn btn-primary">Download Vendor List</a>
+
+
+</div>
+
+
+
+{% endblock %}

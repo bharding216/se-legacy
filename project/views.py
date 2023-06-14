@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, flash, url_for, \
     session, send_file, jsonify, make_response, Response, send_from_directory, current_app
 from flask_login import login_required, current_user, login_user, logout_user
-from sqlalchemy import and_
+from sqlalchemy import and_, inspect
 from project.models import bids, bid_contact, admin_login, supplier_info, \
     project_meta, supplier_login, applicant_docs, chat_history
 from datetime import datetime
@@ -23,10 +23,11 @@ import shutil
 import boto3 
 from botocore.exceptions import NoCredentialsError
 import requests
-from io import BytesIO
+from io import BytesIO, StringIO
 from werkzeug.datastructures import Headers
 import logging
 from cryptography.fernet import Fernet
+import csv
 
 
 views = Blueprint('views', __name__)
@@ -294,6 +295,41 @@ def registration_business():
                            user = current_user
                            )
 
+
+
+@views.route('/admin-data-view')
+def admin_data_view():
+    return render_template('admin_data_view.html', user = current_user)
+
+
+
+
+@views.route('/download-vendor-list')
+def download_vendor_list():
+    supplier_data = supplier_info.query.all()
+    
+    csv_output = StringIO()
+    csv_writer = csv.writer(csv_output)
+    
+    inspector = inspect(db.engine)
+    columns = [column['name'] for column in inspector.get_columns('supplier_info')]
+    csv_writer.writerow(columns)
+    
+    for data in supplier_data:
+        csv_writer.writerow([getattr(data, column) for column in columns])
+
+    filename = 'supplier_info.csv'
+    
+    headers = {
+        'Content-Disposition': 'attachment; filename=' + filename,
+        'Content-Type': 'text/csv'
+    }
+    
+    return Response(
+        csv_output.getvalue(),
+        mimetype='text/csv',
+        headers=headers
+    )
 
 
 

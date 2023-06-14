@@ -106,6 +106,13 @@
                                     Manage Projects
                                 </a>
                             </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page" 
+                                    href="{{ url_for('views.admin_data_view') }}">
+                                    View Data
+                                </a>
+                            </li>
                         {% endif %}
 
                         {% if user.is_authenticated and session['user_type'] == 'supplier' %}
