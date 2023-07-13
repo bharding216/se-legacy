@@ -27,12 +27,12 @@
         <div class="row mb-3">   
             <div class="col-12 align-items-center justify-content-center d-flex">
                 <div class="text-center">
-                    <h1>Current Bids</h1>
+                    <h1>Current Opportunities</h1>
                     <p>A summary of the current projects that are accepting applications.</p>
                     <p>
                         <b>
                             Your business must be 
-                            <a class="hover-link-blue" href="{{ url_for('views.registration_personal') }}">registered</a> with SE Legacy to apply for a bid.
+                            <a class="hover-link-blue" href="{{ url_for('views.registration_personal') }}">registered</a> with SE Legacy to apply.
                         </b>
                     </p>
                 </div>
@@ -47,7 +47,7 @@
 
         {% if open_bids|length == 0 %}
 
-        <p class="text-center">There are no bids to display.</p>
+        <p class="text-center">There are no opportunities to display.</p>
 
         {% else %}
 
