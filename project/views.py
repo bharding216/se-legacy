@@ -342,74 +342,92 @@ def download_vendor_list():
 @views.route('/manage-project', methods=['GET', 'POST'])
 @login_required
 def manage_project():
+    logging.info("STARTING 'manage_project' VIEW FUNCTION.")
     if request.method == 'POST':
-        files = request.files.getlist('file[]')
-        now = datetime.datetime.now()
-        date_time_stamp = now.strftime("%Y-%m-%d %H:%M:%S")
-        secure_date_time_stamp = secure_filename(date_time_stamp)
-        user_id = current_user.id
-        project_title = request.form['project_title']
-        bid_type = request.form['bid_type']
-        organization = request.form['organization']
-        issue_date = request.form['issue_date']
-        notes = request.form['notes']
-        
-        close_date = request.form['close_date']
-        close_time_central = request.form['close_time']
-        datetime_str = close_date + ' ' + close_time_central
-        datetime_obj_central = datetime.datetime.strptime(datetime_str, '%Y-%m-%d %H:%M')
+        try:
+            files = request.files.getlist('file[]')
+            now = datetime.datetime.now()
+            date_time_stamp = now.strftime("%Y-%m-%d %H:%M:%S")
+            secure_date_time_stamp = secure_filename(date_time_stamp)
+            user_id = current_user.id
+            project_title = request.form['project_title']
+            bid_type = request.form['bid_type']
+            organization = request.form['organization']
+            issue_date = request.form['issue_date']
+            notes = request.form['notes']
+            
+            close_date = request.form['close_date']
+            close_time_central = request.form['close_time']
+            datetime_str = close_date + ' ' + close_time_central
+            datetime_obj_central = datetime.datetime.strptime(datetime_str, '%Y-%m-%d %H:%M')
 
-        central_timezone = pytz.timezone('US/Central')
-        datetime_obj_central_localized = central_timezone.localize(datetime_obj_central)
+            central_timezone = pytz.timezone('US/Central')
+            datetime_obj_central_localized = central_timezone.localize(datetime_obj_central)
 
-        utc_timezone = pytz.timezone('UTC')
-        datetime_obj_utc = datetime_obj_central_localized.astimezone(utc_timezone)
+            utc_timezone = pytz.timezone('UTC')
+            datetime_obj_utc = datetime_obj_central_localized.astimezone(utc_timezone)
 
-        # First, create a new project record. Get the project record ID, then
-        # use that ID to create a 'project_meta' record for each file that was uploaded.
-        new_project_record = {
-            'title': project_title,
-            'type': bid_type,
-            'organization': organization,
-            'issue_date': issue_date,
-            'close_date': datetime_obj_utc,
-            'notes': notes,
-            'status': 'open'
-        }
-
-        with db.session() as db_session:
-            new_project = bids(**new_project_record)
-            db_session.add(new_project)
-            db_session.commit()
-            new_project_id = new_project.id
-
-
-        # Configure S3 credentials
-        s3 = boto3.client('s3', region_name='us-east-1',
-                        aws_access_key_id=os.getenv('s3_access_key_id'),
-                        aws_secret_access_key=os.getenv('s3_secret_access_key'))
-        
-        # Set the name of your S3 bucket
-        S3_BUCKET = 'se-legacy-bucket'
-
-        for file in files:
-            s3_filename = f"{secure_date_time_stamp}_{secure_filename(file.filename)}"
-            s3.upload_fileobj(file, S3_BUCKET, s3_filename)
-
-            new_metadata_record = {
-                'title': file.filename,
-                'uploaded_by_user_id': user_id,
-                'date_time_stamp': date_time_stamp,
-                'bid_id': new_project_id
+            # First, create a new project record. Get the project record ID, then
+            # use that ID to create a 'project_meta' record for each file that was uploaded.
+            new_project_record = {
+                'title': project_title,
+                'type': bid_type,
+                'organization': organization,
+                'issue_date': issue_date,
+                'close_date': datetime_obj_utc,
+                'notes': notes,
+                'status': 'open'
             }
 
+            logging.debug("PROJECT RECORD: %s", new_project_record)
+
             with db.session() as db_session:
-                new_project = project_meta(**new_metadata_record)
+                new_project = bids(**new_project_record)
                 db_session.add(new_project)
                 db_session.commit()
+                new_project_id = new_project.id
+            logging.info("Added project record with ID: %s", new_project_id)
 
-        flash('Project created successfully! All files have been uploaded.', 'success')
-        return redirect(url_for('views.manage_project'))
+
+            # Configure S3 credentials
+            s3 = boto3.client('s3', region_name='us-east-1',
+                            aws_access_key_id=os.getenv('s3_access_key_id'),
+                            aws_secret_access_key=os.getenv('s3_secret_access_key'))
+            
+            # Set the name of your S3 bucket
+            S3_BUCKET = 'se-legacy-bucket'
+
+            for file in files:
+                s3_filename = f"{secure_date_time_stamp}_{secure_filename(file.filename)}"
+                logging.info("Attempting to upload '%s' to S3 as '%s'", file.filename, s3_filename)
+                s3.upload_fileobj(file, S3_BUCKET, s3_filename)
+                logging.info("Uploaded file '%s' to S3 as '%s'", file.filename, s3_filename)
+
+                new_metadata_record = {
+                    'title': file.filename,
+                    'uploaded_by_user_id': user_id,
+                    'date_time_stamp': date_time_stamp,
+                    'bid_id': new_project_id
+                }
+
+                with db.session() as db_session:
+                    new_project = project_meta(**new_metadata_record)
+                    db_session.add(new_project)
+                    db_session.commit()
+                logging.info("Added new project meta data record to db: %s", new_metadata_record)
+
+
+            flash('Project created successfully! All files have been uploaded.', 'success')
+            logging.info("EXITING 'manage_project' VIEW FUNCTION.")
+            return redirect(url_for('views.manage_project'))
+
+        except Exception as e:
+            error_message = f"An error occurred: {str(e)}"
+            logging.info("ERROR MESSAGE", error_message)
+            flash(error_message, 'error')
+            logging.info("EXITING 'manage_project' VIEW FUNCTION.")
+            return redirect(url_for('views.manage_project'))
+
 
     # Handle GET request:
     with db.session() as db_session:

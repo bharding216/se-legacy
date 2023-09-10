@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Application Error | {{ error_code }}
+{% endblock %}
+
+{% block head %}
+
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    p {
+      color: #777;
+    }
+
+    .error-code {
+      font-size: 80px;
+      margin-bottom: 10px;
+    }
+
+    .contact-link {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .contact-link:hover {
+      text-decoration: underline;
+    }
+</style>
+
+{% endblock %}
+
+
+
+{% block content %}
+<div class="pt-5">
+    <h1>Oops! Something went wrong</h1>
+    <p>We apologize for the inconvenience. An error occurred ({{ error_code }}).</p>
+    <p>Please try again later or <a href="{{ url_for('views.contact') }}" class="contact-link">contact us</a> if the problem persists.</p>
+</div>
+{% endblock %}

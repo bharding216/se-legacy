@@ -1,5 +1,5 @@
 from datetime import timedelta
-from flask import Flask, session, request, redirect, url_for
+from flask import Flask, session, request, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user
 from flask import g
@@ -32,6 +32,7 @@ def create_app():
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
     app.config['SESSION_COOKIE_SECURE'] = True
     #app.config['SESSION_COOKIE_NAME'] = 'my_session_cookie'
+    app.config['TIMEOUT'] = 300 # seconds
     Session(app)
 
 
@@ -101,6 +102,18 @@ def create_app():
             # Ensure that all requests are secure (HTTPS)
             if not request.is_secure and request.host != 'localhost:2000':
                 return redirect(request.url.replace('http://', 'https://'), code=301)
+
+        def handle_error(error):
+            error_code = getattr(error, 'code', 500)  # Get the error code, default to 500
+            return render_template('error.html', error_code=error_code), error_code
+
+        app.register_error_handler(404, handle_error)
+        app.register_error_handler(500, handle_error)
+        app.register_error_handler(400, handle_error)
+        app.register_error_handler(403, handle_error)
+        app.register_error_handler(401, handle_error)
+        app.register_error_handler(405, handle_error)
+        app.register_error_handler(503, handle_error)
 
         logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
