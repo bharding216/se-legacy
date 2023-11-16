@@ -1022,17 +1022,28 @@ def download_project():
         )
 
         response = requests.get(url)
-
         download_filename = secure_filename(filename)
-
-        # headers = Headers()
-        # headers.add('Content-Disposition', 'attachment', filename=download_filename)
-        # response.headers['Content-Disposition'] = 'attachment; filename=' + download_filename
 
         headers = {
             'Content-Disposition': f'attachment; filename="{download_filename}"',
             'Content-Type': 'application/pdf'  # Specify the content type as PDF
         }
+
+        msg = Message('Document Downloaded', 
+                      sender = ("SE Legacy", 'hello@selegacyconnect.org'),
+                      recipients=['CCallanen@wbpconsult.com']
+                      )
+
+        if current_user.is_authenticated:
+            msg.body = f"The document '{filename}' was downloaded by {current_user.email}."
+        else:
+            msg.body = f"The document '{filename}' was downloaded by a guest user."
+
+        try:
+            mail.send(msg)
+        except Exception as e:
+            print(f"Error sending email notification: {str(e)}")
+            logging.error('experienced an error: %s', str(e))
 
 
         return Response(BytesIO(response.content), headers=headers)
