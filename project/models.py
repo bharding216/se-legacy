@@ -76,7 +76,7 @@ class applicant_docs(db.Model):
 
 class chat_history(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    author_type = db.Column(db.Integer)
+    author_type = db.Column(db.String(45))
     datetime_stamp = db.Column(DateTime)
     comment = db.Column(Text(length=2**24-1))
     supplier_id = db.Column(db.Integer, db.ForeignKey('supplier_info.id'))

@@ -474,27 +474,21 @@ def manage_project():
                             )
 
 
+
+
+
 @views.route('/view-bid-details/<int:bid_id>', methods=['GET', 'POST'])
 def view_bid_details(bid_id):
     bid_object = db.session.query(bids) \
                         .filter_by(id = bid_id) \
                         .first()
     if bid_object:
-        close_date_utc = bid_object.close_date
-        close_date_central = utc_to_central(close_date_utc)
-        bid_object.close_date = close_date_central
-
-    project_meta_records = db.session.query(project_meta) \
-                                    .filter_by(bid_id = bid_object.id) \
-                                    .all()
-
-    applications_for_bid = db.session.query(applicant_docs) \
-                                    .filter_by(bid_id = bid_object.id) \
-                                    .all()
-
-    vendor_chat_list = []
-
+        bid_object = convert_to_central_time(bid_object)
     logging.info('bid_object: %s', bid_object)
+
+    # Collect the docs related to this bid (uploaded by the admin and the vendors)
+    project_meta_records = db.session.query(project_meta).filter_by(bid_id = bid_object.id).all()
+    applications_for_bid = db.session.query(applicant_docs).filter_by(bid_id = bid_object.id).all()
     logging.info('applications_for_bid: %s', applications_for_bid)
 
     for application in applications_for_bid:
@@ -502,25 +496,44 @@ def view_bid_details(bid_id):
         application_submitted_datetime_central = utc_to_central(application_submitted_datetime_utc)
         application.date_time_stamp = application_submitted_datetime_central
 
-    if 'user_type' in session:
+    vendor_chat_list = []
+
+    if not 'user_type' in session: # user_type key not in session
+        logging.info('user_type key not in session.')
+        applied_status = 'not applied'
+        applications_for_bid_and_supplier = []
+        chat_history_records = []
+
+    else:
         logging.info('session_user_type: %s', session['user_type'])
 
-        if session['user_type'] is not None:
+        if session['user_type'] is None: # user is not logged in
+            logging.info('user_type key not in session. User is not logged in.')
+            applied_status = 'not applied'
+            applications_for_bid_and_supplier = []
+            chat_history_records = []
+        
+        else: # user is logged in
             if session['user_type'] == 'supplier':
                 try:
                     logging.info('supplier_id: %s', current_user.supplier_id)
                 except:
                     logging.info('supplier_id: UNKNOWN')
 
+                logging.info('collecting chat history records for supplier_id: %s', current_user.supplier_id)
                 chat_history_records = chat_history.query \
                     .filter_by(supplier_id=current_user.supplier_id, bid_id=bid_id) \
                     .all()
 
                 if chat_history_records:
+                    logging.info('found chat_history_records: %s', chat_history_records)
+
+                    # Convert UTC timestamps to Central Time
                     for message in chat_history_records:
                         chat_timestamp_utc = message.datetime_stamp
                         chat_timestamp_central = utc_to_central(chat_timestamp_utc)
                         message.datetime_stamp = chat_timestamp_central
+
                 else: # no chat history
                     chat_history_records = []
 
@@ -545,22 +558,17 @@ def view_bid_details(bid_id):
                 applications_for_bid_and_supplier = []
                 chat_history_records = []
 
-                distinct_supplier_ids = db.session.query(chat_history.supplier_id).distinct().all()
+                # Collect chat records and company name for each supplier
+                distinct_supplier_ids = db.session.query(chat_history.supplier_id) \
+                    .filter_by(bid_id=bid_id) \
+                    .distinct().all()
+
+
                 supplier_ids = [supplier_id for supplier_id, in distinct_supplier_ids]
                 supplier_info_data = db.session.query(supplier_info.id, supplier_info.company_name).\
                     filter(supplier_info.id.in_(supplier_ids)).all()
                 vendor_chat_list = {supplier_id: company_name for supplier_id, company_name in supplier_info_data}
-                logging.info('vendor_chat_list: %s', vendor_chat_list)
-
-        else: # user is not logged in
-            applied_status = 'not applied'
-            applications_for_bid_and_supplier = []
-            chat_history_records = []
-
-    else: # user_type key not in session
-        applied_status = 'not applied'
-        applications_for_bid_and_supplier = []
-        chat_history_records = []
+                logging.info('vendor_chat_list: %s', vendor_chat_list) # returns: {supplier_id: company_name}
 
     request_data = request.stream.read()
 
@@ -576,70 +584,130 @@ def view_bid_details(bid_id):
                             applied_status = applied_status,
                             chat_history_records = chat_history_records,
                             applications_for_bid_and_supplier = applications_for_bid_and_supplier,
-                            vendor_chat_list = vendor_chat_list)
+                            vendor_chat_list = vendor_chat_list
+                            )
 
+
+def convert_to_central_time(bid_object):
+    close_date_utc = bid_object.close_date
+    close_date_central = utc_to_central(close_date_utc)
+    bid_object.close_date = close_date_central
+    return bid_object
 
 
 
 @views.route('/post-chat-message', methods=['GET', 'POST'])
 @login_required
 def post_chat_message():
+    logging.info('ENTERING POST CHAT MESSAGE VIEW FUNCTION')
+
     message = request.form['message']
     bid_id = request.form['bid_id']
     now = datetime.datetime.utcnow()
     datetime_stamp = now.strftime("%Y-%m-%d %H:%M:%S")
 
+    logging.info('message: %s', message)
+    logging.info('bid_id: %s', bid_id)
+    logging.info('datetime_stamp: %s', datetime_stamp)
+
+    bid_object = db.session.query(bids).filter_by(id=bid_id).first()
+
     with db.session() as db_session:
 
         if session['user_type'] == 'supplier':
+            logging.info('User is a supplier.')
             author_type = 'vendor'
             supplier_id = current_user.supplier_id
+            supplier_object = db_session.query(supplier_info).filter_by(id=supplier_id).first()
+            logging.info('supplier_id: %s', supplier_id)
 
-        elif session['user_type'] == 'admin':
-            author_type = 'admin'
-            supplier_id = request.form['supplier_id']
-
-            new_comment = chat_history(author_type = author_type, 
-                                    datetime_stamp = datetime_stamp, 
-                                    comment = message, 
-                                    bid_id = bid_id,
-                                    supplier_id = supplier_id
+            new_comment = chat_history(author_type=author_type,
+                                    datetime_stamp=datetime_stamp,
+                                    comment=message,
+                                    bid_id=bid_id,
+                                    supplier_id=supplier_id
                                     )
             
+            db.session.add(new_comment)
+            db.session.commit()
+            logging.info('new_comment: %s', new_comment)
+
+            logging.info('Sending email to admin...')
+            admin_msg = Message('New Comment on Bid',
+                            sender = ("SE Legacy", 'hello@selegacyconnect.org'),
+                            recipients = ['brandon@getsurmount.com',
+                                        #   'CCallanen@wbpconsult.com'
+                                        ]
+                            )
+            
+            admin_msg.html = render_template('new_comment_email_to_admin.html',
+                                    bid_object=bid_object,
+                                    supplier_object=supplier_object
+                                    )
+            
+            mail.send(admin_msg)
+
+            flash('New comment successfully added! We\'ll get back to you soon.', category='success')
+            return redirect(url_for('views.view_bid_details', bid_id=bid_id))
+
+        elif session['user_type'] == 'admin':
+            logging.info('User is an admin.')
+            author_type = 'admin'
+            supplier_id = request.form['supplier_id']
+            supplier_object = db_session.query(supplier_info).filter_by(id=supplier_id).first()
+            logging.info('supplier_id: %s', supplier_id)
+
+            new_comment = chat_history(author_type=author_type,
+                                       datetime_stamp=datetime_stamp,
+                                       comment=message,
+                                       bid_id=bid_id,
+                                       supplier_id=supplier_id
+                                       )
             logging.info('new_comment: %s', new_comment)
 
             db.session.add(new_comment)
             db.session.commit()
+            logging.info('New comment successfully added to db.')
+
+            logging.info('Sending email to vendor...')
+
+            try:
+                vendor_msg = Message('SE Legacy replied to your comment',
+                                sender = ("SE Legacy", 'hello@selegacyconnect.org'),
+                                recipients = [supplier_object.email
+                                            ]
+                                )
+                
+                vendor_msg.html = render_template('new_comment_email_to_vendor.html',
+                                        bid_object=bid_object
+                                        )
+                
+                mail.send(vendor_msg)
+                logging.info('Email sent to vendor: %s', supplier_object.email)
+            
+            except Exception as e:
+                logging.error('Error sending email to vendor: %s', str(e))
+                # Send Brandon an email
+                msg = Message('Error sending email to vendor',
+                                sender = ("SE Legacy" 'hello@selegacyconnect.org'),
+                                recipients = ['brandon@getsurmount.com']
+                                )
+                msg.html = f"Error sending email to vendor: {str(e)}"
+                mail.send(msg)
+
+                # If the email fails to send, log the error and send an email to Brandon
+                # Everything should look normal to the user (admin)
+                flash('New comment successfully added!', category='success')
+                return redirect(url_for('views.view_application', 
+                                bid_id=bid_id,
+                                supplier_id=supplier_id
+                                ))
 
             flash('New comment successfully added!', category='success')
-
-            return redirect(url_for('views.view_application', 
-                            bid_id = bid_id,
-                            supplier_id = supplier_id
-                            ))
-
-
+            return redirect(url_for('views.view_bid_details', bid_id=bid_id))
 
         else:
             return 'Error: Session user_type not set'
-
-        new_comment = chat_history(author_type = author_type, 
-                                datetime_stamp = datetime_stamp, 
-                                comment = message, 
-                                bid_id = bid_id,
-                                supplier_id = supplier_id
-                                )
-        
-        logging.info('new_comment: %s', new_comment)
-
-        db.session.add(new_comment)
-        db.session.commit()
-
-        flash('New comment successfully added!', category='success')
-
-        return redirect(url_for('views.view_bid_details', 
-                        bid_id = bid_id
-                        ))
 
 
 
@@ -811,13 +879,14 @@ def apply_for_bid():
 
         admin_msg = Message('New Application Submitted',
                         sender = ("SE Legacy", 'hello@selegacyconnect.org'),
-                        recipients = ['bharding80@gmail.com'
+                        recipients = ['brandon@getsurmount.com',
+                                      'CCallanen@wbpconsult.com'
                                     ]
                         )
         
         admin_msg.html = render_template('new_application_email.html',
-                                bid_object = bid_object,
-                                supplier_object = supplier_object
+                                bid_object=bid_object,
+                                supplier_object=supplier_object
                                 )
         
         mail.send(admin_msg)
