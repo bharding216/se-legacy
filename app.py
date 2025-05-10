@@ -1,17 +1,14 @@
 from project import create_app
 import os
-from flask import session
 
 app = create_app()
 
-@app.before_first_request
-def set_user_type():
-    session['user_type'] = None
+# We now handle session initialization in project/__init__.py within the before_request function
 
 if __name__ == '__main__':
     if 'DYNO' in os.environ:
         # Running on Heroku, use gunicorn
-        port = int(os.environ.get('PORT'))
+        port = int(os.environ.get('PORT', '5000'))
         app.run(host='0.0.0.0', port=port)
     else:
         # Running locally

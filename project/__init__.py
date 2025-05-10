@@ -79,10 +79,12 @@ def create_app():
 
         db.create_all()
 
-        login_manager.login_view = "views.login_vendor"
-        login_manager.login_message = ""
-        login_manager.login_message_category = "error"
+        # Configure login manager with proper typing
         login_manager.init_app(app)
+        # Use dictionary-style access for Flask-Login 0.6.3+ compatibility
+        login_manager.__dict__['login_view'] = "views.login_vendor"
+        login_manager.__dict__['login_message'] = ""
+        login_manager.__dict__['login_message_category'] = "error"
 
         @login_manager.user_loader
         def load_user(id):
@@ -95,13 +97,13 @@ def create_app():
                 user = None
             return user
 
-        @app.before_first_request
-        def set_user_type():
-            session['user_type'] = None
-
         @app.before_request
-        def redirect_to_https():
-            # Ensure that all requests are secure (HTTPS)
+        def before_request():
+            # Initialize user_type if it doesn't exist
+            if 'user_type' not in session:
+                session['user_type'] = None
+            
+            # Handle HTTPS redirect
             if not request.is_secure and request.host != 'localhost:2000':
                 return redirect(request.url.replace('http://', 'https://'), code=301)
 
