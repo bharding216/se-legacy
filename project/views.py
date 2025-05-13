@@ -1475,26 +1475,56 @@ def reset_password(token):
 @views.route('/login-admin', methods=['GET', 'POST'])
 def login_admin():
     if request.method == 'POST':
-        email = request.form["email"]
-        password = request.form["password"]
+        email = request.form.get("email", "").strip().lower()  # Get with default, strip whitespace, and lowercase
+        password = request.form.get("password", "")  # Get with default
 
-        user = admin_login.query.filter_by(email = email).first()
-        if user:
-            if check_password_hash(user.password, password):
-                login_user(user, remember = True)
-                session['user_type'] = 'admin'
-                session.permanent = True
-                flash('Login successful!', category = 'success')
-                return redirect(url_for('views.index'))
+        # Input validation
+        if not email or not password:
+            flash('Please provide both email and password.', category='error')
+            return render_template('login_admin.html', user=current_user)
+
+        # Basic email format validation
+        if '@' not in email or '.' not in email:
+            flash('Please enter a valid email address.', category='error')
+            return render_template('login_admin.html', user=current_user)
+
+        try:
+            user = admin_login.query.filter_by(email=email).first()
+            
+            if user:
+                if check_password_hash(user.password, password):
+                    # Successful login
+                    login_user(user, remember=True)
+                    session['user_type'] = 'admin'
+                    session.permanent = True
+                    
+                    # Set secure session flags
+                    session['_fresh'] = True
+                    session['_id'] = str(uuid.uuid4())
+                    
+                    # Log successful login
+                    logging.info('Admin login successful for email: %s', email)
+                    
+                    flash('Login successful!', category='success')
+                    return redirect(url_for('views.index'))
+                else:
+                    # Log failed password attempt
+                    logging.warning('Failed admin login attempt - incorrect password for email: %s', email)
+                    flash('Incorrect password. Please try again.', category='error')
+                    return render_template('login_admin.html', email=email, user=current_user)
             else:
-                flash('Incorrect password. Please try again.', category = 'error')
-                return redirect(url_for('views.login_admin', email = email))
-        else:
-            flash('That email is not associated with an account.', category = 'error')
+                # Log failed login attempt
+                logging.warning('Failed admin login attempt - email not found: %s', email)
+                flash('That email is not associated with an account.', category='error')
+                return render_template('login_admin.html', user=current_user)
+                
+        except Exception as e:
+            # Log any unexpected errors
+            logging.error('Error during admin login: %s', str(e))
+            flash('An error occurred during login. Please try again.', category='error')
+            return render_template('login_admin.html', user=current_user)
 
-    return render_template('login_admin.html',
-                           user = current_user
-                           )
+    return render_template('login_admin.html', user=current_user)
 
 
 
