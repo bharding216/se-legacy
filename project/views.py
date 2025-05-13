@@ -1379,6 +1379,18 @@ def reset_password_request(user_type):
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()  # Normalize email case
         
+        if not email:
+            flash('Please enter your email address.', category='error')
+            return render_template("reset_password_form.html", 
+                               user_type = user_type,
+                               user = current_user)
+
+        if '@' not in email or '.' not in email:
+            flash('Please enter a valid email address.', category='error')
+            return render_template("reset_password_form.html", 
+                               user_type = user_type,
+                               user = current_user)
+
         if user_type == 'supplier':
             user = supplier_login.query.filter_by(email=email).first()
         else:
@@ -1389,9 +1401,6 @@ def reset_password_request(user_type):
             current_time_str = current_time.strftime('%H:%M:%S')
 
             s = URLSafeSerializer(os.getenv('secret_key') or 'default-secret-key')
-
-            # 'dumps' takes a list as input and serializes it into a string representation.
-            # This returns a string representation of the data - encoded using your secret key.
             token = s.dumps([email, current_time_str])
 
             reset_password_url = url_for('views.reset_password', 
@@ -1399,22 +1408,28 @@ def reset_password_request(user_type):
                                           _external=True
                                           )
 
-            msg = Message('Password Reset Request', 
-                sender = ("SE Legacy", 'hello@selegacyconnect.org'),
-                recipients = [email],
-                body=f'Reset your password by visiting the following link: {reset_password_url}')
+            try:
+                msg = Message('Password Reset Request', 
+                    sender = ("SE Legacy", 'hello@selegacyconnect.org'),
+                    recipients = [email],
+                    body=f'Reset your password by visiting the following link: {reset_password_url}')
 
-            mail.send(msg) 
-            flash('Success! We sent you an email containing a link where you can reset your password.', category = 'success')
-            return redirect(url_for('views.index'))
-
+                mail.send(msg)
+                logging.info('Password reset email sent to: %s', email)
+                flash('Success! We sent you an email containing a link where you can reset your password.', category = 'success')
+                return redirect(url_for('views.index'))
+            except Exception as e:
+                logging.error('Failed to send password reset email to %s: %s', email, str(e))
+                flash('There was an error sending the password reset email. Please try again later.', category='error')
+                return render_template("reset_password_form.html", 
+                                   user_type = user_type,
+                                   user = current_user)
         else:
-            flash('That email does not exist in our system. Please try again.', category = 'error')
-            return redirect(url_for('views.reset_password_request',
-                                     user_type = user_type,
-                                     user = current_user
-                                     )
-                            )
+            logging.warning('Password reset requested for non-existent email: %s', email)
+            flash('That email does not exist in our system. Please check the email address and try again.', category = 'error')
+            return render_template("reset_password_form.html", 
+                               user_type = user_type,
+                               user = current_user)
     
     else:
         return render_template("reset_password_form.html", 
@@ -1427,46 +1442,55 @@ def reset_password_request(user_type):
 @views.route("/reset_password/<token>", methods=["GET", "POST"])
 def reset_password(token):
     if request.method == "POST":
-
         s = URLSafeSerializer(os.getenv('secret_key') or 'default-secret-key')
         try: 
-            # loads => take in a serialized string and generate the original list of string inputs.
-            # The first element in the list is the user's email.
             user_email_from_token = (s.loads(token))[0].strip().lower()  # Normalize email case
+            logging.info('Attempting password reset for email: %s', user_email_from_token)
         except BadSignature:
-            flash('You do not have permission to change the password for this email. Please contact us if you continue to have issues.', category = 'error')
-            return redirect(url_for('views.reset_password', 
-                                    token = token))
+            logging.error('Invalid password reset token received')
+            flash('The password reset link is invalid or has expired. Please request a new password reset link.', category = 'error')
+            return redirect(url_for('views.reset_password_request', user_type='supplier'))
 
         new_password = request.form.get("new_password")
         confirm_password = request.form.get("confirm_password")
 
+        if not new_password or not confirm_password:
+            flash('Please enter both new password and confirmation password.', category='error')
+            return render_template("reset_password.html", 
+                               user = current_user, 
+                               token = token)
+
         if new_password != confirm_password:
             flash('Those passwords do not match. Please try again.', category='error')
-            return redirect(url_for('views.reset_password', 
-                                    token = token))
+            return render_template("reset_password.html", 
+                               user = current_user, 
+                               token = token)
 
-        hashed_password = generate_password_hash(new_password or '')
+        hashed_password = generate_password_hash(new_password)
         
+        # Try supplier login first
         user = supplier_login.query.filter_by(email = user_email_from_token).first()
-        if user is None: # Then it must have been an admin requesting a new password
-            user = admin_login.query.filter_by(email = user_email_from_token).first()
-
         if user is None:
-            flash('User not found', category='error')
-            return redirect(url_for('views.index'))
+            # Try admin login if not found in supplier login
+            user = admin_login.query.filter_by(email = user_email_from_token).first()
+            if user is None:
+                logging.error('Password reset attempted for non-existent email: %s', user_email_from_token)
+                flash('We could not find an account with that email address. Please check the email address and try again.', category='error')
+                return render_template("reset_password.html", 
+                                   user = current_user, 
+                                   token = token)
             
         user.password = hashed_password
         db.session.commit()
+        logging.info('Password successfully reset for email: %s', user_email_from_token)
 
-        flash('Your password has been successfully updated! Please login.', category = 'success')
+        flash('Your password has been successfully updated! Please login with your new password.', category = 'success')
         return redirect(url_for('views.index'))
 
     else:
         return render_template("reset_password.html", 
                                user = current_user, 
-                               token = token
-                               )
+                               token = token)
 
 
 
