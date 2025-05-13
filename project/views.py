@@ -1377,13 +1377,12 @@ def login_vendor():
 @views.route("/reset_password_request/<string:user_type>", methods=['GET', 'POST'])
 def reset_password_request(user_type):
     if request.method == "POST":
-        email = request.form.get("email")
+        email = request.form.get("email", "").strip().lower()  # Normalize email case
         
         if user_type == 'supplier':
             user = supplier_login.query.filter_by(email=email).first()
         else:
             user = admin_login.query.filter_by(email=email).first()
-
 
         if user:
             current_time = datetime.datetime.now().time()
@@ -1433,7 +1432,7 @@ def reset_password(token):
         try: 
             # loads => take in a serialized string and generate the original list of string inputs.
             # The first element in the list is the user's email.
-            user_email_from_token = (s.loads(token))[0]
+            user_email_from_token = (s.loads(token))[0].strip().lower()  # Normalize email case
         except BadSignature:
             flash('You do not have permission to change the password for this email. Please contact us if you continue to have issues.', category = 'error')
             return redirect(url_for('views.reset_password', 
