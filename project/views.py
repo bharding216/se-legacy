@@ -72,7 +72,7 @@ def contact():
                     msg = Message('New Contact Form Submission',
                                     sender = ("SE Legacy", 'hello@selegacyconnect.org'),
                                     recipients = ['brandon@getsurmount.com',
-                                                  'CCallanen@wbpconsult.com'
+                                                #   'CCallanen@wbpconsult.com'
                                                 ]
                                     )
                     
