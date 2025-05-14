@@ -74,7 +74,7 @@
                 <div class="navbar-collapse collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto me-5">
 
-                        {% if not user.is_authenticated %}
+                        {% if not current_user.is_authenticated %}
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" 
                                 href="#"
@@ -99,7 +99,7 @@
                             </li>
                         {% endif %}
 
-                        {% if user.is_authenticated and session['user_type'] == 'admin' %}
+                        {% if current_user.is_authenticated and session['user_type'] == 'admin' %}
                             <li class="nav-item">
                                 <a class="nav-link" aria-current="page" 
                                     href="{{ url_for('views.manage_project') }}">
@@ -115,7 +115,7 @@
                             </li>
                         {% endif %}
 
-                        {% if user.is_authenticated and session['user_type'] == 'supplier' %}
+                        {% if current_user.is_authenticated and session['user_type'] == 'supplier' %}
                             <li class="nav-item">
                                 <a class="nav-link" aria-current="page" 
                                     href="{{ url_for('views.applications_summary_page') }}">
@@ -138,7 +138,7 @@
                             </a>
                         </li>
 
-                        {% if user.is_authenticated %}
+                        {% if current_user.is_authenticated %}
                             <li class="nav-item">
                                 <a class="nav-link" aria-current="page" 
                                     href="{{ url_for('views.logout') }}">
@@ -181,7 +181,7 @@
                 <div class="col-6">
                     <h5 class="pb-2" style="color: black;">Quick Links</h5>
 
-                    {% if not user.is_authenticated %}
+                    {% if not current_user.is_authenticated %}
                     <p class="footer-links">                            
                         <a href="{{ url_for('views.login_vendor') }}" class="nav-link">Vendor Login</a>
                     </p>
@@ -191,13 +191,13 @@
                     </p>
                     {% endif %}
 
-                    {% if user.is_authenticated and session['user_type'] == 'admin' %}
+                    {% if current_user.is_authenticated and session['user_type'] == 'admin' %}
                     <p class="footer-links">
                         <a class="nav-link" href="{{ url_for('views.manage_project') }}">Manage Projects</a>
                     </p>
                     {% endif %}
 
-                    {% if user.is_authenticated and session['user_type'] == 'supplier' %}
+                    {% if current_user.is_authenticated and session['user_type'] == 'supplier' %}
                     <p class="footer-links">
                         <a class="nav-link" href="{{ url_for('views.applications_summary_page') }}">My Applications</a>
                     </p>
@@ -213,7 +213,7 @@
                     </p>
 
 
-                    {% if user.is_authenticated %}
+                    {% if current_user.is_authenticated %}
                     <p class="footer-links">                            
                         <a href="{{ url_for('views.logout') }}" class="nav-link">Logout</a>
                     </p>

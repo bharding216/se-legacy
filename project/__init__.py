@@ -41,13 +41,13 @@ def create_app():
     app.config['TIMEOUT'] = 300 # seconds
     Session(app)
 
-    # Mail config settings:
-    app.config['MAIL_SERVER']=os.getenv('MAIL_SERVER')
-    app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
-    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS')
-    app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL')
+    # Mail config settings for AWS SES:
+    app.config['MAIL_SERVER'] = os.getenv('AWS_SES_MAIL_SERVER')
+    app.config['MAIL_PORT'] = 587 
+    app.config['MAIL_USERNAME'] = os.getenv('AWS_SES_SMTP_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('AWS_SES_SMTP_PASSWORD')
+    app.config['MAIL_USE_TLS'] = True
+    app.config['MAIL_DEFAULT_SENDER'] = ('SE Legacy', 'hello@selegacyconnect.org')
 
     # LEGACY MYSQL
     # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://' + os.getenv('mysql_user') + \
