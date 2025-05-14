@@ -1554,7 +1554,7 @@ def login_admin():
 @views.route('/admin-signup', methods=['GET', 'POST'])
 def admin_signup():
     if request.method == "POST":
-        email = request.form['email']
+        email = request.form['email'].strip().lower()  # Convert to lowercase and strip whitespace
         password1 = request.form['password1']
         password2 = request.form['password2']
         secret_code = request.form['secret_code']

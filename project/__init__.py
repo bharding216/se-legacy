@@ -23,10 +23,16 @@ def create_app():
 
     app.jinja_env.globals.update(generate_sitemap = generate_sitemap)
 
-    app.config['MYSQL_HOST'] = os.getenv('mysql_host')
-    app.config['MYSQL_USER'] = os.getenv('mysql_user')
-    app.config['MYSQL_PASSWORD'] = os.getenv('mysql_password')
-    app.config['MYSQL_DB'] = os.getenv('mysql_db')
+    # app.config['MYSQL_HOST'] = os.getenv('mysql_host')
+    # app.config['MYSQL_USER'] = os.getenv('mysql_user')
+    # app.config['MYSQL_PASSWORD'] = os.getenv('mysql_password')
+    # app.config['MYSQL_DB'] = os.getenv('mysql_db')
+
+    # app.config['POSTGRES_HOST'] = os.getenv('postgres_host')
+    # app.config['POSTGRES_USER'] = os.getenv('postgres_user')
+    # app.config['POSTGRES_PASSWORD'] = os.getenv('postgres_password')
+    # app.config['POSTGRES_DB'] = os.getenv('postgres_db')
+
     app.config['SECRET_KEY'] = os.getenv('secret_key')
     app.config['SESSION_TYPE'] = 'filesystem'
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
@@ -34,7 +40,6 @@ def create_app():
     #app.config['SESSION_COOKIE_NAME'] = 'my_session_cookie'
     app.config['TIMEOUT'] = 300 # seconds
     Session(app)
-
 
     # Mail config settings:
     app.config['MAIL_SERVER']='live.smtp.mailtrap.io'
@@ -44,11 +49,19 @@ def create_app():
     app.config['MAIL_USE_TLS'] = True
     app.config['MAIL_USE_SSL'] = False
 
-
+    # LEGACY MYSQL
     # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://' + os.getenv('mysql_user') + \
     #     ':' + os.getenv('mysql_password') + '@' + os.getenv('mysql_host') + '/' + os.getenv('mysql_db')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///se_legacy.db'
-
+    
+    # Get environment variables with default empty strings to prevent None values
+    postgres_user = os.getenv('postgres_user', '')
+    postgres_password = os.getenv('postgres_password', '')
+    postgres_host = os.getenv('postgres_host', '')
+    postgres_db = os.getenv('postgres_db', '')
+    
+    app.config['SQLALCHEMY_DATABASE_URI'] = (
+        f'postgresql+psycopg2://{postgres_user}:{postgres_password}@{postgres_host}/{postgres_db}'
+    )
 
     app.config['SQLALCHEMY_POOL_SIZE'] = 5
     app.config['SQLALCHEMY_POOL_RECYCLE'] = 450
